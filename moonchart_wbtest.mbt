@@ -211,3 +211,26 @@ test "linechart with custom colors" {
   let svg = chart.render()
   assert_eq!(svg.contains("#123456"), true)
 }
+
+test "scatter basic render" {
+  let chart = ScatterChart::new()
+    .title("Correlation")
+    .x_label("Height")
+    .y_label("Weight")
+    .series(Series::new("Group A", [1.0, 2.0, 3.0, 4.0, 5.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("<circle"), true)
+  assert_eq(svg.contains("Correlation"), true)
+}
+
+test "radar basic render" {
+  let chart = RadarChart::new()
+    .title("Skills")
+    .axis_labels(["Speed", "Power", "Accuracy", "Defense", "Stamina"])
+    .series(Series::new("Player 1", [80.0, 70.0, 90.0, 60.0, 85.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("<polygon"), true)
+  assert_eq(svg.contains("Speed"), true)
+}

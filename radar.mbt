@@ -166,6 +166,7 @@ fn render_radar_axes(
   start_angle : Float,
   axis_labels : Array[String],
   i : Int,
+  config : ChartConfig,
 ) -> String {
   if i >= n {
     result
@@ -179,7 +180,7 @@ fn render_radar_axes(
     let label_r = chart_r + 18.0
     let lx = cx + label_r * cos_approx(angle)
     let ly = cy + label_r * sin_approx(angle) + 4.0
-    let label = text(lx, ly, axis_labels[i], 11, "middle")
+    let label = text(lx, ly, axis_labels[i], config.axis_font_size, "middle")
 
     render_radar_axes(
       result + axis_line + label,
@@ -191,6 +192,7 @@ fn render_radar_axes(
       start_angle,
       axis_labels,
       i + 1,
+      config,
     )
   }
 }
@@ -207,12 +209,13 @@ fn render_radar_series(
   series_list : Array[Series],
   max_val : Float,
   si : Int,
+  config : ChartConfig,
 ) -> String {
   if si >= series_list.length() {
     result
   } else {
     let values = series_list[si].values
-    let color = get_color(si)
+    let color = get_chart_color(config, si)
     let points : Array[(Float, Float)] = []
     let series_points = build_series_polygon_points(
       points,
@@ -238,6 +241,7 @@ fn render_radar_series(
       series_list,
       max_val,
       si + 1,
+      config,
     )
   }
 }
@@ -247,7 +251,7 @@ pub fn RadarChart::render(self : RadarChart) -> String {
   if n == 0 {
     let base = svg_open(self.width, self.height)
     if self.title != "" {
-      return base + text(self.width / 2.0, 20.0, self.title, 16, "middle") + svg_close()
+      return base + text(self.width / 2.0, 20.0, self.title, self.config.title_font_size, "middle") + svg_close()
     } else {
       return base + svg_close()
     }
@@ -274,7 +278,7 @@ pub fn RadarChart::render(self : RadarChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, 20.0, self.title, 16, "middle")
+    base + text(self.width / 2.0, 20.0, self.title, self.config.title_font_size, "middle")
   } else {
     base
   }
@@ -303,6 +307,7 @@ pub fn RadarChart::render(self : RadarChart) -> String {
     start_angle,
     self.axis_labels,
     0,
+    self.config,
   )
 
   // Data series
@@ -319,6 +324,7 @@ pub fn RadarChart::render(self : RadarChart) -> String {
       self.series_list,
       max_val,
       0,
+      self.config,
     )
   } else {
     with_axes
