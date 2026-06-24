@@ -78,3 +78,34 @@ test "legend with multiple names returns items" {
   assert_eq(result.contains("B"), true)
   assert_eq(result.contains("C"), true)
 }
+
+test "barchart basic render" {
+  let chart = BarChart::new()
+    .title("Test")
+    .x_labels(["A", "B", "C"])
+    .series(Series::new("S1", [10.0, 20.0, 30.0]))
+    .width(600.0).height(300.0)
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("</svg>"), true)
+  assert_eq(svg.contains("Test"), true)
+  assert_eq(svg.contains("<rect"), true)
+}
+
+test "barchart multi series" {
+  let chart = BarChart::new()
+    .x_labels(["Jan", "Feb"])
+    .series(Series::new("A", [10.0, 20.0]))
+    .series(Series::new("B", [30.0, 15.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("A"), true)
+  assert_eq(svg.contains("B"), true)
+  assert_eq(svg.contains("Jan"), true)
+}
+
+test "barchart empty data" {
+  let chart = BarChart::new().title("Empty")
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("</svg>"), true)
+}
