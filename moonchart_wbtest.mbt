@@ -42,3 +42,26 @@ test "svg open and close" {
   assert_eq(s.contains("800"), true)
   assert_eq(s.contains("600"), true)
 }
+
+test "y axis for positive data" {
+  let layout = compute_y_axis(0.0, 187.0, 400.0, 40.0, 60.0)
+  assert_eq(layout.y_min <= 0.0, true)
+  assert_eq(layout.y_max >= 187.0, true)
+  assert_eq(layout.step > 0.0, true)
+}
+
+test "y axis for zero range" {
+  let layout = compute_y_axis(5.0, 5.0, 400.0, 40.0, 60.0)
+  assert_eq(layout.y_min < 5.0, true)
+  assert_eq(layout.y_max > 5.0, true)
+}
+
+test "y_to_svg maps min to bottom" {
+  let y = y_to_svg(0.0, 0.0, 100.0, 400.0, 40.0, 60.0)
+  assert_eq(y > 300.0, true)
+}
+
+test "y_to_svg maps max to top" {
+  let y = y_to_svg(100.0, 0.0, 100.0, 400.0, 40.0, 60.0)
+  assert_eq(y < 100.0, true)
+}
