@@ -1,6 +1,6 @@
-// import {
-//   "oilleelssq-wq/moonchart" @lib,
-// }
+import {
+  "oilleelssq-wq/moonchart",
+}
 
 options(
   "is-main": true,

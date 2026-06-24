@@ -234,3 +234,167 @@ test "radar basic render" {
   assert_eq(svg.contains("<polygon"), true)
   assert_eq(svg.contains("Speed"), true)
 }
+
+// CSV Reader tests
+
+test "csv parse simple" {
+  let (headers, rows) = parse_csv("Name,Value\nA,10\nB,20")
+  assert_eq!(headers[0], "Name")
+  assert_eq!(headers[1], "Value")
+  assert_eq!(rows.length(), 2)
+  assert_eq!(rows[0][0], "A")
+  assert_eq!(rows[0][1], "10")
+}
+
+test "csv parse single row" {
+  let (headers, rows) = parse_csv("X,Y,Z\n1,2,3")
+  assert_eq!(headers.length(), 3)
+  assert_eq!(rows.length(), 1)
+  assert_eq!(rows[0][0], "1")
+  assert_eq!(rows[0][1], "2")
+  assert_eq!(rows[0][2], "3")
+}
+
+test "csv parse empty content" {
+  let (headers, rows) = parse_csv("")
+  assert_eq!(headers.length(), 0)
+  assert_eq!(rows.length(), 0)
+}
+
+test "csv parse header only" {
+  let (headers, rows) = parse_csv("A,B,C")
+  assert_eq!(headers.length(), 3)
+  assert_eq!(rows.length(), 0)
+}
+
+test "csv parse with newline at end" {
+  let (headers, rows) = parse_csv("Col1,Col2\nv1,v2\n")
+  assert_eq!(headers.length(), 2)
+  assert_eq!(rows.length(), 1)
+  assert_eq!(rows[0][0], "v1")
+}
+
+test "csv parse to series" {
+  let (labels, series_list) = parse_csv_to_series("Label,A,B\nJan,10,20\nFeb,30,40")
+  assert_eq!(labels.length(), 2)
+  assert_eq!(labels[0], "Jan")
+  assert_eq!(labels[1], "Feb")
+  assert_eq!(series_list.length(), 2)
+  assert_eq!(series_list[0].name, "A")
+  assert_eq!(series_list[0].values[0], 10.0)
+  assert_eq!(series_list[1].name, "B")
+  assert_eq!(series_list[1].values[1], 40.0)
+}
+
+test "parse float simple" {
+  assert_eq!(parse_float_or_zero("42"), 42.0)
+  assert_eq!(parse_float_or_zero("3.14"), 3.14)
+  assert_eq!(parse_float_or_zero("-7"), -7.0)
+  assert_eq!(parse_float_or_zero("0"), 0.0)
+  assert_eq!(parse_float_or_zero("abc"), 0.0)
+}
+
+// Demo chart tests
+
+test "demo barchart generates svg" {
+  let svg = generate_demo_barchart()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Monthly Revenue"), true)
+  assert_eq!(svg.contains("Product A"), true)
+  assert_eq!(svg.contains("Product B"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo linechart generates svg" {
+  let svg = generate_demo_linechart()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("User Growth"), true)
+  assert_eq!(svg.contains("<polyline"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo piechart generates svg" {
+  let svg = generate_demo_piechart()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Market Share"), true)
+  assert_eq!(svg.contains("Chrome"), true)
+  assert_eq!(svg.contains("<path"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo scatter generates svg" {
+  let svg = generate_demo_scatter()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Height vs Weight"), true)
+  assert_eq!(svg.contains("<circle"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo radar generates svg" {
+  let svg = generate_demo_radar()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Player Skill"), true)
+  assert_eq!(svg.contains("<polygon"), true)
+  assert_eq!(svg.contains("Speed"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo area generates svg" {
+  let svg = generate_demo_area()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Website Traffic"), true)
+  assert_eq!(svg.contains("<polygon"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo dashboard generates svg" {
+  let svg = generate_demo_dashboard()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("MoonChart Demo Dashboard"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "demo all charts render valid svg" {
+  let charts = [
+    generate_demo_barchart(),
+    generate_demo_linechart(),
+    generate_demo_piechart(),
+    generate_demo_scatter(),
+    generate_demo_radar(),
+    generate_demo_area(),
+    generate_demo_dashboard(),
+  ]
+  for i = 0; i < charts.length(); i = i + 1 {
+    assert_eq!(charts[i].contains("<svg"), true)
+    assert_eq!(charts[i].contains("</svg>"), true)
+  }
+}
+
+test "split lines via parse_csv" {
+  let (headers, rows) = parse_csv("a\nb\nc")
+  // First line is header: "a"
+  assert_eq!(headers.length(), 1)
+  assert_eq!(headers[0], "a")
+  // Remaining lines are rows
+  assert_eq!(rows.length(), 2)
+  assert_eq!(rows[0][0], "b")
+  assert_eq!(rows[1][0], "c")
+}
+
+test "split csv line via parse_csv" {
+  let (headers, rows) = parse_csv("a,b,c\n1,2,3")
+  assert_eq!(headers.length(), 3)
+  assert_eq!(headers[0], "a")
+  assert_eq!(headers[1], "b")
+  assert_eq!(headers[2], "c")
+  assert_eq!(rows.length(), 1)
+  assert_eq!(rows[0][0], "1")
+}
+
+test "parse float or zero edge cases" {
+  assert_eq!(parse_float_or_zero("42"), 42.0)
+  assert_eq!(parse_float_or_zero("3.14"), 3.14)
+  assert_eq!(parse_float_or_zero("-7"), -7.0)
+  assert_eq!(parse_float_or_zero("0"), 0.0)
+  assert_eq!(parse_float_or_zero(""), 0.0)
+}
