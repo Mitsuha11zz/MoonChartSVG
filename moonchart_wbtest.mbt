@@ -14,3 +14,10 @@ test "Slice creation" {
   assert_eq!(sl.name, "A")
   assert_eq!(sl.value, 42.0)
 }
+
+test "color cycles through palette" {
+  assert_eq!(get_color(0), "#4E79A7")
+  assert_eq!(get_color(1), "#F28E2B")
+  assert_eq!(get_color(10), "#4E79A7")
+  assert_eq!(get_color(9), "#BAB0AC")
+}
