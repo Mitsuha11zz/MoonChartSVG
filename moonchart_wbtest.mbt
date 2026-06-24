@@ -138,3 +138,29 @@ test "linechart single point" {
   let svg = chart.render()
   assert_eq(svg.contains("<circle"), true)
 }
+
+test "piechart basic render" {
+  let chart = PieChart::new()
+    .title("Market")
+    .slice("A", 40.0)
+    .slice("B", 35.0)
+    .slice("C", 25.0)
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("<path"), true)
+  assert_eq(svg.contains("Market"), true)
+  assert_eq(svg.contains("A"), true)
+}
+
+test "piechart single slice" {
+  let chart = PieChart::new().slice("Only", 100.0)
+  let svg = chart.render()
+  assert_eq(svg.contains("<path"), true)
+}
+
+test "piechart empty" {
+  let chart = PieChart::new()
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("</svg>"), true)
+}
