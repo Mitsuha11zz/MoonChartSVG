@@ -4,6 +4,7 @@ pub(all) struct AreaChart {
   series_list : Array[Series]
   width : Float
   height : Float
+  config : ChartConfig
 }
 
 pub fn AreaChart::new() -> AreaChart {
@@ -13,6 +14,7 @@ pub fn AreaChart::new() -> AreaChart {
     series_list: [],
     width: 800.0,
     height: 400.0,
+    config: ChartConfig::default(),
   }
 }
 
@@ -36,6 +38,10 @@ pub fn AreaChart::width(self : AreaChart, w : Float) -> AreaChart {
 
 pub fn AreaChart::height(self : AreaChart, h : Float) -> AreaChart {
   { ..self, height: h }
+}
+
+pub fn AreaChart::config(self : AreaChart, c : ChartConfig) -> AreaChart {
+  { ..self, config: c }
 }
 
 // Build area polygon points: line points + (last_x, baseline_y) + (first_x, baseline_y)
@@ -112,12 +118,13 @@ fn render_area_series(
   mr : Float,
   baseline_y : Float,
   si : Int,
+  config : ChartConfig,
 ) -> String {
   if si >= series_list.length() {
     result
   } else {
     let values = series_list[si].values
-    let color = get_color(si)
+    let color = get_chart_color(config, si)
     let pts : Array[(Float, Float)] = []
     let with_series = render_area_points(
       result,
@@ -148,6 +155,7 @@ fn render_area_series(
       mr,
       baseline_y,
       si + 1,
+      config,
     )
   }
 }
@@ -166,7 +174,7 @@ pub fn AreaChart::render(self : AreaChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, mt - 12.0, self.title, 16, "middle")
+    base + text(self.width / 2.0, mt - 12.0, self.title, self.config.title_font_size, "middle")
   } else {
     base
   }
@@ -182,6 +190,7 @@ pub fn AreaChart::render(self : AreaChart) -> String {
     ml,
     mr,
     0,
+    self.config,
   )
 
   // X-axis baseline
@@ -206,6 +215,7 @@ pub fn AreaChart::render(self : AreaChart) -> String {
       mr,
       baseline_y,
       0,
+      self.config,
     )
   } else {
     with_baseline
@@ -221,6 +231,7 @@ pub fn AreaChart::render(self : AreaChart) -> String {
     mr,
     baseline_y,
     0,
+    self.config,
   )
 
   // Legend
@@ -228,7 +239,7 @@ pub fn AreaChart::render(self : AreaChart) -> String {
   for i = 0; i < self.series_list.length(); i = i + 1 {
     names.push(self.series_list[i].name)
   }
-  let with_legend = with_labels + render_legend(names, self.width, self.height - 10.0)
+  let with_legend = with_labels + render_legend(names, self.width, self.height - 10.0, self.config)
 
   with_legend + svg_close()
 }

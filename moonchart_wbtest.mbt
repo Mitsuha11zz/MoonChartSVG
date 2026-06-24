@@ -67,12 +67,12 @@ test "y_to_svg maps max to top" {
 }
 
 test "legend with single name returns empty" {
-  let result = render_legend(["Only"], 800.0, 380.0)
+  let result = render_legend(["Only"], 800.0, 380.0, ChartConfig::default())
   assert_eq(result, "")
 }
 
 test "legend with multiple names returns items" {
-  let result = render_legend(["A", "B", "C"], 800.0, 380.0)
+  let result = render_legend(["A", "B", "C"], 800.0, 380.0, ChartConfig::default())
   assert_eq(result.contains("rect"), true)
   assert_eq(result.contains("A"), true)
   assert_eq(result.contains("B"), true)
@@ -185,4 +185,29 @@ test "areachart multi series" {
   let svg = chart.render()
   assert_eq(svg.contains("X"), true)
   assert_eq(svg.contains("Y"), true)
+}
+
+test "barchart with custom config" {
+  let cfg = ChartConfig::{ colors: ["#FF0000", "#00FF00"], show_grid: false, title_font_size: 20, axis_font_size: 10, legend_font_size: 9 }
+  let chart = BarChart::new()
+    .title("Test")
+    .x_labels(["A", "B"])
+    .series(Series::new("S1", [10.0, 20.0]))
+    .series(Series::new("S2", [30.0, 15.0]))
+    .config(cfg)
+  let svg = chart.render()
+  assert_eq!(svg.contains("#FF0000"), true)
+  assert_eq!(svg.contains("#00FF00"), true)
+  assert_eq!(svg.contains("font-size=\"20\""), true)
+}
+
+test "linechart with custom colors" {
+  let cfg = ChartConfig::default()
+  let cfg2 = ChartConfig::{ ..cfg, colors: ["#123456"] }
+  let chart = LineChart::new()
+    .x_labels(["A", "B"])
+    .series(Series::new("X", [1.0, 2.0]))
+    .config(cfg2)
+  let svg = chart.render()
+  assert_eq!(svg.contains("#123456"), true)
 }

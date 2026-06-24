@@ -198,7 +198,7 @@ pub fn PieChart::render(self : PieChart) -> String {
     for i = 0; i < num_slices; i = i + 1 {
       names.push(self.slices[i].name)
     }
-    let with_legend = with_slices + render_legend(names, self.width, self.height - 10.0)
+    let with_legend = with_slices + render_legend(names, self.width, self.height - 10.0, ChartConfig::default())
 
     with_legend + svg_close()
   }

@@ -4,6 +4,7 @@ struct BarChart {
   series_list : Array[Series]
   width : Float
   height : Float
+  config : ChartConfig
 }
 
 pub fn BarChart::new() -> BarChart {
@@ -13,6 +14,7 @@ pub fn BarChart::new() -> BarChart {
     series_list: [],
     width: 800.0,
     height: 400.0,
+    config: ChartConfig::default(),
   }
 }
 
@@ -36,6 +38,10 @@ pub fn BarChart::width(self : BarChart, w : Float) -> BarChart {
 
 pub fn BarChart::height(self : BarChart, h : Float) -> BarChart {
   { ..self, height: h }
+}
+
+pub fn BarChart::config(self : BarChart, c : ChartConfig) -> BarChart {
+  { ..self, config: c }
 }
 
 // Find data range across all series
@@ -91,13 +97,19 @@ fn render_y_grid(
   mr : Float,
   chart_width : Float,
   i : Int,
+  config : ChartConfig,
 ) -> String {
   if i < ticks.length() {
     let y_pos = y_to_svg(ticks[i], y_min, y_max, height, mt, mb)
-    let grid_line = line(ml - 5.0, y_pos, chart_width - mr, y_pos, "#e0e0e0", 1.0)
-    let tick_label = text(ml - 8.0, y_pos + 4.0, tick_labels[i], 11, "end")
+    let tick_label = text(ml - 8.0, y_pos + 4.0, tick_labels[i], config.axis_font_size, "end")
+    let new_acc = if config.show_grid {
+      let grid_line = line(ml - 5.0, y_pos, chart_width - mr, y_pos, "#e0e0e0", 1.0)
+      acc + grid_line + tick_label
+    } else {
+      acc + tick_label
+    }
     render_y_grid(
-      acc + grid_line + tick_label,
+      new_acc,
       ticks,
       tick_labels,
       y_min,
@@ -109,6 +121,7 @@ fn render_y_grid(
       mr,
       chart_width,
       i + 1,
+      config,
     )
   } else {
     acc
@@ -128,6 +141,7 @@ fn render_category_bars(
   chart_h : Float,
   baseline_y : Float,
   si : Int,
+  config : ChartConfig,
 ) -> String {
   if si < num_series {
     let val = series_list[si].values[ci]
@@ -136,7 +150,7 @@ fn render_category_bars(
     let bar_x = group_x + bar_w * (si_float + offset)
     let bar_h = (val - y_min) / (y_max - y_min) * chart_h
     let bar_y = baseline_y - bar_h
-    let color_str = get_color(si)
+    let color_str = get_chart_color(config, si)
     let rect_str = rect(bar_x, bar_y, bar_w, bar_h, color_str)
     render_category_bars(
       acc + rect_str,
@@ -150,6 +164,7 @@ fn render_category_bars(
       chart_h,
       baseline_y,
       si + 1,
+      config,
     )
   } else {
     acc
@@ -175,6 +190,7 @@ fn render_bars_and_labels(
   chart_width : Float,
   baseline_y : Float,
   ci : Int,
+  config : ChartConfig,
 ) -> String {
   if ci < num_categories {
     let group_x = x_to_svg(
@@ -197,9 +213,10 @@ fn render_bars_and_labels(
       chart_h,
       baseline_y,
       0,
+      config,
     )
     let label_x = group_x + group_w / 2.0
-    let with_label = with_bars + text(label_x, baseline_y + 16.0, x_labels[ci], 11, "middle")
+    let with_label = with_bars + text(label_x, baseline_y + 16.0, x_labels[ci], config.axis_font_size, "middle")
     render_bars_and_labels(
       with_label,
       series_list,
@@ -218,6 +235,7 @@ fn render_bars_and_labels(
       chart_width,
       baseline_y,
       ci + 1,
+      config,
     )
   } else {
     acc
@@ -248,7 +266,7 @@ pub fn BarChart::render(self : BarChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, mt - 12.0, self.title, 16, "middle")
+    base + text(self.width / 2.0, mt - 12.0, self.title, self.config.title_font_size, "middle")
   } else {
     base
   }
@@ -267,6 +285,7 @@ pub fn BarChart::render(self : BarChart) -> String {
     mr,
     self.width,
     0,
+    self.config,
   )
 
   // X-axis baseline
@@ -297,6 +316,7 @@ pub fn BarChart::render(self : BarChart) -> String {
       self.width,
       baseline_y,
       0,
+      self.config,
     )
   } else {
     with_baseline
@@ -307,7 +327,7 @@ pub fn BarChart::render(self : BarChart) -> String {
   for i = 0; i < self.series_list.length(); i = i + 1 {
     names.push(self.series_list[i].name)
   }
-  let with_legend = with_bars + render_legend(names, self.width, self.height - 10.0)
+  let with_legend = with_bars + render_legend(names, self.width, self.height - 10.0, self.config)
 
   with_legend + svg_close()
 }
