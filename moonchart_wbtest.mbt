@@ -65,3 +65,16 @@ test "y_to_svg maps max to top" {
   let y = y_to_svg(100.0, 0.0, 100.0, 400.0, 40.0, 60.0)
   assert_eq(y < 100.0, true)
 }
+
+test "legend with single name returns empty" {
+  let result = render_legend(["Only"], 800.0, 380.0)
+  assert_eq(result, "")
+}
+
+test "legend with multiple names returns items" {
+  let result = render_legend(["A", "B", "C"], 800.0, 380.0)
+  assert_eq(result.contains("rect"), true)
+  assert_eq(result.contains("A"), true)
+  assert_eq(result.contains("B"), true)
+  assert_eq(result.contains("C"), true)
+}
