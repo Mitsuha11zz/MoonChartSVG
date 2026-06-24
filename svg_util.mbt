@@ -77,6 +77,26 @@ pub fn polyline(points : Array[(Float, Float)], stroke : String, stroke_width : 
   ])
 }
 
+fn build_point_string(points : Array[(Float, Float)], idx : Int, acc : String) -> String {
+  if idx >= points.length() { acc }
+  else {
+    let (x, y) = points[idx]
+    let new_acc = if idx == 0 { x.to_string() + "," + y.to_string() }
+                  else { acc + " " + x.to_string() + "," + y.to_string() }
+    build_point_string(points, idx + 1, new_acc)
+  }
+}
+
+pub fn polygon(points : Array[(Float, Float)], fill : String, stroke : String, stroke_width : Float) -> String {
+  let pts_str = build_point_string(points, 0, "")
+  void_tag("polygon", [
+    ("points", pts_str),
+    ("fill", fill),
+    ("stroke", stroke),
+    ("stroke-width", stroke_width.to_string()),
+  ])
+}
+
 pub fn circle(cx : Float, cy : Float, r : Float, fill : String) -> String {
   void_tag("circle", [
     ("cx", cx.to_string()),

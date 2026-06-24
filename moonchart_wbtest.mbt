@@ -164,3 +164,25 @@ test "piechart empty" {
   assert_eq(svg.contains("<svg"), true)
   assert_eq(svg.contains("</svg>"), true)
 }
+
+test "areachart basic render" {
+  let chart = AreaChart::new()
+    .title("Growth")
+    .x_labels(["Q1", "Q2", "Q3", "Q4"])
+    .series(Series::new("Revenue", [50.0, 80.0, 120.0, 200.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("<polygon"), true)
+  assert_eq(svg.contains("<polyline"), true)
+  assert_eq(svg.contains("Growth"), true)
+}
+
+test "areachart multi series" {
+  let chart = AreaChart::new()
+    .x_labels(["A", "B", "C"])
+    .series(Series::new("X", [10.0, 20.0, 15.0]))
+    .series(Series::new("Y", [5.0, 25.0, 10.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("X"), true)
+  assert_eq(svg.contains("Y"), true)
+}
