@@ -224,6 +224,16 @@ fn render_bars_and_labels(
   }
 }
 
+fn min_categories(series_list : Array[Series], max_cat : Int, idx : Int) -> Int {
+  if idx >= series_list.length() { max_cat }
+  else {
+    let next_max = if series_list[idx].values.length() < max_cat {
+      series_list[idx].values.length()
+    } else { max_cat }
+    min_categories(series_list, next_max, idx + 1)
+  }
+}
+
 pub fn BarChart::render(self : BarChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 60.0
@@ -264,7 +274,7 @@ pub fn BarChart::render(self : BarChart) -> String {
   let with_baseline = with_y_grid + line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
 
   // Bars and x labels
-  let num_categories = self.x_labels.length()
+  let num_categories = min_categories(self.series_list, self.x_labels.length(), 0)
   let num_series = self.series_list.length()
   let with_bars = if num_categories > 0 && num_series > 0 {
     let group_w = (self.width - ml - mr) / Float::from_int(num_categories)
