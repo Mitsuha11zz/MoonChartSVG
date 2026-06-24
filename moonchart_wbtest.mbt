@@ -21,3 +21,24 @@ test "color cycles through palette" {
   assert_eq!(get_color(10), "#4E79A7")
   assert_eq!(get_color(9), "#BAB0AC")
 }
+
+test "svg rect generation" {
+  let r = rect(10.0, 20.0, 100.0, 50.0, "red")
+  assert_eq(r.contains("<rect"), true)
+  assert_eq(r.contains("x=\"10\""), true)
+  assert_eq(r.contains("fill=\"red\""), true)
+}
+
+test "svg text generation" {
+  let t = text(0.0, 0.0, "hello", 12, "middle")
+  assert_eq(t.contains("<text"), true)
+  assert_eq(t.contains("hello"), true)
+  assert_eq(t.contains("font-size=\"12\""), true)
+}
+
+test "svg open and close" {
+  let s = svg_open(800.0, 600.0)
+  assert_eq(s.contains("<svg"), true)
+  assert_eq(s.contains("800"), true)
+  assert_eq(s.contains("600"), true)
+}
