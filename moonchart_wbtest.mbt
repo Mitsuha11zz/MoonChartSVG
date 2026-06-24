@@ -109,3 +109,32 @@ test "barchart empty data" {
   assert_eq(svg.contains("<svg"), true)
   assert_eq(svg.contains("</svg>"), true)
 }
+
+test "linechart basic render" {
+  let chart = LineChart::new()
+    .title("Trend")
+    .x_labels(["Q1", "Q2", "Q3", "Q4"])
+    .series(Series::new("Revenue", [50.0, 80.0, 120.0, 200.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("<svg"), true)
+  assert_eq(svg.contains("<polyline"), true)
+  assert_eq(svg.contains("Trend"), true)
+}
+
+test "linechart multi series" {
+  let chart = LineChart::new()
+    .x_labels(["A", "B"])
+    .series(Series::new("X", [1.0, 2.0]))
+    .series(Series::new("Y", [3.0, 4.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("X"), true)
+  assert_eq(svg.contains("Y"), true)
+}
+
+test "linechart single point" {
+  let chart = LineChart::new()
+    .x_labels(["A"])
+    .series(Series::new("Only", [5.0]))
+  let svg = chart.render()
+  assert_eq(svg.contains("<circle"), true)
+}
