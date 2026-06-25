@@ -441,3 +441,58 @@ test "stackedbar with custom config" {
   assert_eq!(svg.contains("#00FF00"), true)
   assert_eq!(svg.contains("font-size=\"20\""), true)
 }
+
+test "horizontal bar basic render" {
+  let chart = HorBarChart::new()
+    .title("Population")
+    .y_labels(["Tokyo", "Delhi", "Shanghai"])
+    .series(Series::new("2024", [37.0, 33.0, 29.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Tokyo"), true)
+  assert_eq!(svg.contains("Population"), true)
+  assert_eq!(svg.contains("<rect"), true)
+}
+
+test "horizontal bar multi series" {
+  let chart = HorBarChart::new()
+    .y_labels(["A", "B"])
+    .series(Series::new("X", [10.0, 20.0]))
+    .series(Series::new("Y", [15.0, 25.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("X"), true)
+  assert_eq!(svg.contains("Y"), true)
+}
+
+test "donut basic render" {
+  let chart = DonutChart::new()
+    .title("Browser Share")
+    .slice("Chrome", 65.0)
+    .slice("Firefox", 8.0)
+    .slice("Safari", 18.0)
+    .slice("Edge", 9.0)
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("<path"), true)
+  assert_eq!(svg.contains("Chrome"), true)
+  assert_eq!(svg.contains("65"), true)
+}
+
+test "data stats sum" {
+  let s = sum([1.0, 2.0, 3.0, 4.0])
+  assert_eq!(s, 10.0)
+}
+
+test "data stats mean" {
+  let m = mean([1.0, 2.0, 3.0, 4.0])
+  assert_eq!(m, 2.5)
+}
+
+test "data stats min and max" {
+  assert_eq!(min_value([3.0, 1.0, 4.0, 2.0]), 1.0)
+  assert_eq!(max_value([3.0, 1.0, 4.0, 2.0]), 4.0)
+}
+
+test "data stats median" {
+  assert_eq!(median([1.0, 3.0, 2.0, 4.0, 5.0]), 3.0)
+}
