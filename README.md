@@ -1,6 +1,6 @@
-# MoonChart
+# MoonChartSVG
 
-Pure MoonBit SVG chart generation library.
+纯 MoonBit 实现的 SVG 图表生成库，支持9种图表类型，零依赖，Builder API 设计。
 
 ## Features
 
@@ -14,7 +14,7 @@ Pure MoonBit SVG chart generation library.
 ## Installation
 
 ```
-moon add Mitsuha/moonchart
+moon add Mitsuha/MoonChartSVG
 ```
 
 ## Quick Start

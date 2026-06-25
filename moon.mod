@@ -9,13 +9,13 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "Mitsuha/moonchart"
+name = "Mitsuha/MoonChartSVG"
 
 version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = "https://gitlink.org.cn/Mitsuha/moonchart"
+repository = "https://gitlink.org.cn/Mitsuha/MoonChartSVG"
 
 license = "Apache-2.0"
 
