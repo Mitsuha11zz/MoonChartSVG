@@ -14,7 +14,7 @@ Pure MoonBit SVG chart generation library.
 ## Installation
 
 ```
-moon add oillee/moonchart
+moon add Mitsuha/moonchart
 ```
 
 ## Quick Start
