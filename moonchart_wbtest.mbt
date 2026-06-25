@@ -398,3 +398,46 @@ test "parse float or zero edge cases" {
   assert_eq!(parse_float_or_zero("0"), 0.0)
   assert_eq!(parse_float_or_zero(""), 0.0)
 }
+
+test "stackedbar basic render" {
+  let chart = StackedBarChart::new()
+    .title("Revenue Breakdown")
+    .x_labels(["Q1", "Q2"])
+    .series(Series::new("Hardware", [100.0, 150.0]))
+    .series(Series::new("Software", [80.0, 120.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("Revenue Breakdown"), true)
+  assert_eq!(svg.contains("Hardware"), true)
+  assert_eq!(svg.contains("Software"), true)
+}
+
+test "stackedbar single series" {
+  let chart = StackedBarChart::new()
+    .x_labels(["A", "B", "C"])
+    .series(Series::new("Only", [10.0, 20.0, 30.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("<rect"), true)
+}
+
+test "stackedbar empty data" {
+  let chart = StackedBarChart::new().title("Empty")
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("</svg>"), true)
+}
+
+test "stackedbar with custom config" {
+  let cfg = ChartConfig::{ colors: ["#FF0000", "#00FF00"], show_grid: false, title_font_size: 20, axis_font_size: 10, legend_font_size: 9 }
+  let chart = StackedBarChart::new()
+    .title("Test")
+    .x_labels(["A", "B"])
+    .series(Series::new("S1", [10.0, 20.0]))
+    .series(Series::new("S2", [30.0, 15.0]))
+    .config(cfg)
+  let svg = chart.render()
+  assert_eq!(svg.contains("#FF0000"), true)
+  assert_eq!(svg.contains("#00FF00"), true)
+  assert_eq!(svg.contains("font-size=\"20\""), true)
+}
