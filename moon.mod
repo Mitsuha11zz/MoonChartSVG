@@ -9,13 +9,13 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "oilleelssq-wq/moonchart"
+name = "oillee/moonchart"
 
 version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = "https://github.com/oilleelssq-wq/moonchart"
+repository = "https://gitlink.org.cn/oillee/moonchart"
 
 license = "Apache-2.0"
 
