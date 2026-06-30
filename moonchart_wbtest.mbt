@@ -496,3 +496,131 @@ test "data stats min and max" {
 test "data stats median" {
   assert_eq!(median([1.0, 3.0, 2.0, 4.0, 5.0]), 3.0)
 }
+
+test "theme dark color palette" {
+  let t = Theme::dark()
+  assert_eq!(t.colors.length(), 10)
+  assert_eq!(t.background, "#1a1a2e")
+}
+
+test "theme light is default" {
+  let t = Theme::light()
+  assert_eq!(t.colors[0], "#4E79A7")
+}
+
+test "theme to config" {
+  let t = Theme::minimal()
+  let cfg = t.to_config()
+  assert_eq!(cfg.colors.length(), 10)
+}
+
+test "barchart with negative values" {
+  let chart = BarChart::new()
+    .x_labels(["A", "B", "C"])
+    .series(Series::new("val", [-10.0, 5.0, -3.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<svg"), true)
+  assert_eq!(svg.contains("<rect"), true)
+}
+
+test "linechart with single series no labels" {
+  let chart = LineChart::new()
+    .series(Series::new("solo", [1.0, 2.0, 3.0, 4.0, 5.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<polyline"), true)
+}
+
+test "scatter with axis labels" {
+  let chart = ScatterChart::new()
+    .x_label("Height")
+    .y_label("Weight")
+    .series(ScatterSeries::new("Group A", [(160.0, 55.0), (170.0, 65.0)]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("Height"), true)
+  assert_eq!(svg.contains("Weight"), true)
+}
+
+test "radar with grid levels config" {
+  let chart = RadarChart::new()
+    .axes(["Speed", "Power", "Defense"])
+    .series(RadarSeries::new("Player 1", [8.0, 7.0, 9.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<polygon"), true)
+}
+
+test "area chart basic" {
+  let chart = AreaChart::new()
+    .x_labels(["Q1", "Q2", "Q3"])
+    .series(Series::new("revenue", [100.0, 200.0, 150.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<polygon"), true)
+  assert_eq!(svg.contains("<polyline"), true)
+}
+
+test "stacked bar multi series stacking" {
+  let chart = StackedBarChart::new()
+    .x_labels(["A", "B"])
+    .series(Series::new("base", [10.0, 20.0]))
+    .series(Series::new("top", [5.0, 10.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<rect"), true)
+}
+
+test "horizontal bar with single category" {
+  let chart = HorBarChart::new()
+    .y_labels(["Tokyo"])
+    .series(Series::new("2024", [37.0]))
+  let svg = chart.render()
+  assert_eq!(svg.contains("<rect"), true)
+  assert_eq!(svg.contains("Tokyo"), true)
+}
+
+test "donut chart hole ratio" {
+  let chart = DonutChart::new()
+    .title("Share")
+    .slice("A", 60.0)
+    .slice("B", 40.0)
+  let svg = chart.render()
+  assert_eq!(svg.contains("<path"), true)
+  assert_eq!(svg.contains("Share"), true)
+}
+
+test "csv parse empty input" {
+  let (headers, rows) = parse_csv("")
+  assert_eq!(headers.length(), 0)
+  assert_eq!(rows.length(), 0)
+}
+
+test "csv parse single row no data" {
+  let (headers, rows) = parse_csv("Name,Value")
+  assert_eq!(headers.length(), 2)
+  assert_eq!(rows.length(), 0)
+}
+
+test "data stats sum" {
+  assert_eq!(sum([1.0, 2.0, 3.0]), 6.0)
+  assert_eq!(sum([]), 0.0)
+}
+
+test "data stats std dev" {
+  let s = std_dev([2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0])
+  assert_eq!(s > 0.0, true)
+}
+
+test "barchart builder chain" {
+  let c = BarChart::new().title("T").width(600.0).height(300.0)
+  let svg = c.render()
+  assert_eq!(svg.contains("<svg"), true)
+}
+
+test "linechart builder chain" {
+  let c = LineChart::new().title("L").width(500.0).height(250.0)
+  let svg = c.render()
+  assert_eq!(svg.contains("<svg"), true)
+}
+
+test "piechart builder chain" {
+  let c = PieChart::new().title("P").slice("X", 100.0)
+  let svg = c.render()
+  assert_eq!(svg.contains("X"), true)
+}
