@@ -23,15 +23,15 @@ MoonBit 生态目前缺乏数据可视化工具，本项目填补了这一空白
 
 | 图表 | 文件 | 说明 |
 |------|------|------|
-| **柱状图** (BarChart) | barchart.mbt (333行) | 分组柱状图，多系列并排 |
-| **折线图** (LineChart) | linechart.mbt (358行) | 多系列折线，数据点标记 |
-| **饼图** (PieChart) | piechart.mbt (205行) | 弧形切片，百分比标签 |
-| **散点图** (ScatterChart) | scatter.mbt (336行) | X-Y 数据点，可配置点大小 |
-| **雷达图** (RadarChart) | radar.mbt (341行) | 多轴对比，多层同心网格 |
-| **面积图** (AreaChart) | areachart.mbt (245行) | 折线下方填充区域 |
-| **堆叠柱状图** (StackedBarChart) | stackedbar.mbt (279行) | 系列柱体垂直堆叠 |
-| **水平柱状图** (HorBarChart) | horbarchart.mbt (363行) | 横向柱体，适合分类对比 |
-| **环形图** (DonutChart) | donutchart.mbt (177行) | 饼图中心镂空，支持比例调节 |
+| **柱状图** (BarChart) | barchart.mbt (403行) | 分组柱状图，多系列并排 |
+| **折线图** (LineChart) | linechart.mbt (442行) | 多系列折线，数据点标记 |
+| **饼图** (PieChart) | piechart.mbt (265行) | 弧形切片，百分比标签 |
+| **散点图** (ScatterChart) | scatter.mbt (436行) | X-Y 数据点，可配置点大小 |
+| **雷达图** (RadarChart) | radar.mbt (411行) | 多轴对比，多层同心网格 |
+| **面积图** (AreaChart) | areachart.mbt (276行) | 折线下方填充区域 |
+| **堆叠柱状图** (StackedBarChart) | stackedbar.mbt (335行) | 系列柱体垂直堆叠 |
+| **水平柱状图** (HorBarChart) | horbarchart.mbt (380行) | 横向柱体，适合分类对比 |
+| **环形图** (DonutChart) | donutchart.mbt (228行) | 饼图中心镂空，支持比例调节 |
 
 ### 基础设施模块
 
@@ -48,8 +48,9 @@ MoonBit 生态目前缺乏数据可视化工具，本项目填补了这一空白
 
 ### 工程质量
 
-- 60 个单元测试全部通过
-- GitHub Actions CI 持续集成
+- 78 个单元测试全部通过（`moon test --deny-warn`）
+- GitHub Actions CI 持续集成（含 `moon check --deny-warn` + `moon fmt --check` + `moon info` + `moon test --deny-warn`）
+- 已发布至 mooncakes.io（`moon add Mitsuha11zz/MoonChartSVG`）
 - 完整 README（中英文、安装、快速开始、API 参考）
 - Builder API 设计，链式调用风格
 - 纯函数式实现（递归辅助函数，无 var 可变状态）
@@ -71,14 +72,14 @@ MoonBit 生态中**不存在可对标项目**，MoonChartSVG 是首个 MoonBit �
 
 | 类别 | 行数 |
 |------|------|
-| 图表实现（9种） | 2,637 |
-| 基础设施（axes/color/config/legend/svg_util） | 283 |
-| 工具模块（csv_reader/data_stats/demo） | 502 |
-| 测试代码 | 546 |
-| Demo / CLI / 配置 | 79 |
-| **合计** | **4,047** |
+| 图表实现（9种） | 3,176 |
+| 基础设施（axes/color/config/legend/svg_util/palette/theme） | 643 |
+| 工具模块（csv_reader/data_stats/demo） | 619 |
+| 测试代码 | 779 |
+| Demo / CLI / 配置 | 73 |
+| **合计** | **5,290** |
 
-项目总计约 **4,047 行** MoonBit 代码，19 次有效提交，60 个测试全部通过。
+项目总计约 **5,290 行** MoonBit 代码，30 次有效提交，78 个测试全部通过。
 
 ## 适用场景
 

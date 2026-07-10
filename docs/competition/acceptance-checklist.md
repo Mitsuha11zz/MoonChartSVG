@@ -23,7 +23,7 @@
 - [x] `PieChart::new()` — create with defaults (500x400)
 - [x] Builder methods: `title()`, `slice(name, value)`, `width()`, `height()`
 - [x] `render()` — generate SVG arc paths with percentage labels
-- [x] Taylor series sin/cos for SVG arc computation
+- [x] Angle-normalized Taylor series sin/cos for SVG arc computation
 
 ### ScatterChart (散点图)
 - [x] Builder + render with circle markers
@@ -94,9 +94,11 @@
 - [x] CLI main with demo output
 
 ## Project Quality
-- [x] `moon check` passes with 0 errors
-- [x] `moon test` — 60 tests, all passing
-- [x] CI configuration (`.github/workflows/ci.yml`)
+- [x] `moon check --deny-warn` passes with 0 errors
+- [x] `moon test --deny-warn` — 78 tests, all passing
+- [x] `moon fmt --check` passes
+- [x] CI configuration (`.github/workflows/ci.yml`) with matrix build
+- [x] Published to mooncakes.io (`Mitsuha11zz/MoonChartSVG` v0.1.2)
 - [x] README with installation, quick start, and API reference
 - [x] Apache-2.0 License
 - [x] GitHub repo: https://github.com/Mitsuha11zz/MoonChartSVG
