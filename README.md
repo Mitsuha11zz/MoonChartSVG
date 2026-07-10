@@ -14,7 +14,7 @@
 ## Installation
 
 ```
-moon add Mitsuha/MoonChartSVG
+moon add Mitsuha11zz/MoonChartSVG
 ```
 
 ## Quick Start

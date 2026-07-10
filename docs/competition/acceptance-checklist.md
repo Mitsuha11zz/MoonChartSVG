@@ -98,7 +98,7 @@
 - [x] `moon test --deny-warn` — 78 tests, all passing
 - [x] `moon fmt --check` passes
 - [x] CI configuration (`.github/workflows/ci.yml`) with matrix build
-- [x] Published to mooncakes.io (`Mitsuha11zz/MoonChartSVG` v0.1.2)
+- [x] Published to mooncakes.io (`Mitsuha11zz/MoonChartSVG` v0.1.4)
 - [x] README with installation, quick start, and API reference
 - [x] Apache-2.0 License
 - [x] GitHub repo: https://github.com/Mitsuha11zz/MoonChartSVG
