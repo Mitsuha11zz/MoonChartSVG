@@ -1,3 +1,4 @@
+///|
 pub(all) struct DonutChart {
   title : String
   slices : Array[Slice]
@@ -7,6 +8,7 @@ pub(all) struct DonutChart {
   hole_ratio : Float
 }
 
+///|
 pub fn DonutChart::new() -> DonutChart {
   {
     title: "",
@@ -18,32 +20,43 @@ pub fn DonutChart::new() -> DonutChart {
   }
 }
 
+///|
 pub fn DonutChart::title(self : DonutChart, t : String) -> DonutChart {
   { ..self, title: t }
 }
 
-pub fn DonutChart::slice(self : DonutChart, name : String, value : Float) -> DonutChart {
+///|
+pub fn DonutChart::slice(
+  self : DonutChart,
+  name : String,
+  value : Float,
+) -> DonutChart {
   let new_slices = self.slices
   new_slices.push(Slice::new(name, value))
   { ..self, slices: new_slices }
 }
 
+///|
 pub fn DonutChart::width(self : DonutChart, w : Float) -> DonutChart {
   { ..self, width: w }
 }
 
+///|
 pub fn DonutChart::height(self : DonutChart, h : Float) -> DonutChart {
   { ..self, height: h }
 }
 
+///|
 pub fn DonutChart::config(self : DonutChart, c : ChartConfig) -> DonutChart {
   { ..self, config: c }
 }
 
+///|
 pub fn DonutChart::hole_ratio(self : DonutChart, hr : Float) -> DonutChart {
   { ..self, hole_ratio: hr }
 }
 
+///|
 fn donut_slice_path(
   cx : Float,
   cy : Float,
@@ -52,27 +65,55 @@ fn donut_slice_path(
   start_angle : Float,
   end_angle : Float,
 ) -> String {
-  let (outer_start_x, outer_start_y) = polar_to_cartesian(cx, cy, outer_r, start_angle)
-  let (outer_end_x, outer_end_y) = polar_to_cartesian(cx, cy, outer_r, end_angle)
-  let (inner_start_x, inner_start_y) = polar_to_cartesian(cx, cy, inner_r, start_angle)
-  let (inner_end_x, inner_end_y) = polar_to_cartesian(cx, cy, inner_r, end_angle)
+  let (outer_start_x, outer_start_y) = polar_to_cartesian(
+    cx, cy, outer_r, start_angle,
+  )
+  let (outer_end_x, outer_end_y) = polar_to_cartesian(
+    cx, cy, outer_r, end_angle,
+  )
+  let (inner_start_x, inner_start_y) = polar_to_cartesian(
+    cx, cy, inner_r, start_angle,
+  )
+  let (inner_end_x, inner_end_y) = polar_to_cartesian(
+    cx, cy, inner_r, end_angle,
+  )
   let pi : Float = 3.1415926535
   let large_arc = if end_angle - start_angle > pi { "1" } else { "0" }
 
   "M " +
-  outer_start_x.to_string() + " " + outer_start_y.to_string() +
-  " A " + outer_r.to_string() + " " + outer_r.to_string() +
-  " 0 " + large_arc + " 0 " +
-  outer_end_x.to_string() + " " + outer_end_y.to_string() +
+  outer_start_x.to_string() +
+  " " +
+  outer_start_y.to_string() +
+  " A " +
+  outer_r.to_string() +
+  " " +
+  outer_r.to_string() +
+  " 0 " +
+  large_arc +
+  " 0 " +
+  outer_end_x.to_string() +
+  " " +
+  outer_end_y.to_string() +
   " L " +
-  inner_end_x.to_string() + " " + inner_end_y.to_string() +
-  " A " + inner_r.to_string() + " " + inner_r.to_string() +
-  " 0 " + large_arc + " 1 " +
-  inner_start_x.to_string() + " " + inner_start_y.to_string() +
+  inner_end_x.to_string() +
+  " " +
+  inner_end_y.to_string() +
+  " A " +
+  inner_r.to_string() +
+  " " +
+  inner_r.to_string() +
+  " 0 " +
+  large_arc +
+  " 1 " +
+  inner_start_x.to_string() +
+  " " +
+  inner_start_y.to_string() +
   " Z"
 }
 
 // Render donut slices recursively
+
+///|
 fn render_donut_slices(
   result : String,
   slices : Array[Slice],
@@ -94,7 +135,11 @@ fn render_donut_slices(
     let color = get_color(idx)
 
     let with_path = result +
-      path(donut_slice_path(cx, cy, outer_r, inner_r, start_angle, end_angle), color, "#ffffff")
+      path(
+        donut_slice_path(cx, cy, outer_r, inner_r, start_angle, end_angle),
+        color,
+        "#ffffff",
+      )
 
     // Percentage label at mid-angle, positioned halfway between inner and outer radius
     let mid_angle = start_angle + sweep / 2.0
@@ -119,6 +164,7 @@ fn render_donut_slices(
   }
 }
 
+///|
 pub fn DonutChart::render(self : DonutChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 20.0
@@ -142,7 +188,11 @@ pub fn DonutChart::render(self : DonutChart) -> String {
     let cx = self.width / 2.0
     let chart_h = self.height - mt - mb - 40.0
     let cy = mt + chart_h / 2.0
-    let outer_r = if self.width < self.height { self.width / 3.0 } else { chart_h / 2.5 }
+    let outer_r = if self.width < self.height {
+      self.width / 3.0
+    } else {
+      chart_h / 2.5
+    }
     let inner_r = outer_r * self.hole_ratio
 
     let tau : Float = 3.1415926535 * 2.0
@@ -169,7 +219,8 @@ pub fn DonutChart::render(self : DonutChart) -> String {
     for i = 0; i < num_slices; i = i + 1 {
       names.push(self.slices[i].name)
     }
-    let with_legend = with_slices + center_label +
+    let with_legend = with_slices +
+      center_label +
       render_legend(names, self.width, self.height - 10.0, self.config)
 
     with_legend + svg_close()

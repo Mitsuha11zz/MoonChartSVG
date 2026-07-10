@@ -1,3 +1,4 @@
+///|
 struct PieChart {
   title : String
   slices : Array[Slice]
@@ -5,50 +6,91 @@ struct PieChart {
   height : Float
 }
 
+///|
 pub fn PieChart::new() -> PieChart {
-  {
-    title: "",
-    slices: [],
-    width: 500.0,
-    height: 400.0,
-  }
+  { title: "", slices: [], width: 500.0, height: 400.0 }
 }
 
+///|
 pub fn PieChart::title(self : PieChart, t : String) -> PieChart {
   { ..self, title: t }
 }
 
-pub fn PieChart::slice(self : PieChart, name : String, value : Float) -> PieChart {
+///|
+pub fn PieChart::slice(
+  self : PieChart,
+  name : String,
+  value : Float,
+) -> PieChart {
   let new_slices = self.slices
   new_slices.push(Slice::new(name, value))
   { ..self, slices: new_slices }
 }
 
+///|
 pub fn PieChart::width(self : PieChart, w : Float) -> PieChart {
   { ..self, width: w }
 }
 
+///|
 pub fn PieChart::height(self : PieChart, h : Float) -> PieChart {
   { ..self, height: h }
 }
 
-// Taylor series sin approximation: x - x^3/3! + x^5/5! - x^7/7!
+// Normalize angle to [0, 2π) range
+
+///|
+fn normalize_angle(angle : Float) -> Float {
+  let tau : Float = 2.0 * 3.1415926535
+  let mut a = angle
+  while a < 0.0 {
+    a = a + tau
+  }
+  while a >= tau {
+    a = a - tau
+  }
+  a
+}
+
+// Taylor series sin approximation with angle reduction to [0, π/2]
+
+///|
 fn sin_approx(x : Float) -> Float {
-  let x2 = x * x
-  let x3 = x2 * x
+  let pi : Float = 3.1415926535
+  let x_norm = normalize_angle(x)
+  let sign : Float = if x_norm > pi { -1.0 } else { 1.0 }
+  let x_reduced : Float = if x_norm > pi { x_norm - pi } else { x_norm }
+  let x_final = if x_reduced > pi / 2.0 { pi - x_reduced } else { x_reduced }
+  let x2 = x_final * x_final
+  let x3 = x2 * x_final
   let x5 = x3 * x2
   let x7 = x5 * x2
-  x - x3 / 6.0 + x5 / 120.0 - x7 / 5040.0
+  let f6 : Float = 6.0
+  let f120 : Float = 120.0
+  let f5040 : Float = 5040.0
+  sign * (x_final - x3 / f6 + x5 / f120 - x7 / f5040)
 }
 
-// Taylor series cos approximation: 1 - x^2/2! + x^4/4! - x^6/6!
+// Taylor series cos approximation with angle reduction to [0, π/2]
+
+///|
 fn cos_approx(x : Float) -> Float {
-  let x2 = x * x
+  let pi : Float = 3.1415926535
+  let x_norm = normalize_angle(x)
+  let sign : Float = if x_norm > pi { -1.0 } else { 1.0 }
+  let x_reduced : Float = if x_norm > pi { x_norm - pi } else { x_norm }
+  let x_final = if x_reduced > pi / 2.0 { pi - x_reduced } else { x_reduced }
+  let x2 = x_final * x_final
   let x4 = x2 * x2
   let x6 = x4 * x2
-  1.0 - x2 / 2.0 + x4 / 24.0 - x6 / 720.0
+  let one : Float = 1.0
+  let two : Float = 2.0
+  let f24 : Float = 24.0
+  let f720 : Float = 720.0
+  sign * (one - x2 / two + x4 / f24 - x6 / f720)
 }
 
+///|
 fn polar_to_cartesian(
   cx : Float,
   cy : Float,
@@ -60,6 +102,7 @@ fn polar_to_cartesian(
   (x, y)
 }
 
+///|
 fn slice_path(
   cx : Float,
   cy : Float,
@@ -93,6 +136,8 @@ fn slice_path(
 }
 
 // Recursive sum of slice values
+
+///|
 fn sum_slice_values(slices : Array[Slice], idx : Int, acc : Float) -> Float {
   if idx >= slices.length() {
     acc
@@ -102,6 +147,8 @@ fn sum_slice_values(slices : Array[Slice], idx : Int, acc : Float) -> Float {
 }
 
 // Format percentage as integer + "%"
+
+///|
 fn format_percent(pct : Float) -> String {
   let int_pct = pct.to_int()
   let pct_str = int_pct.to_string()
@@ -109,6 +156,8 @@ fn format_percent(pct : Float) -> String {
 }
 
 // Render pie slices recursively
+
+///|
 fn render_pie_slices(
   result : String,
   slices : Array[Slice],
@@ -153,6 +202,7 @@ fn render_pie_slices(
   }
 }
 
+///|
 pub fn PieChart::render(self : PieChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 20.0
@@ -176,7 +226,11 @@ pub fn PieChart::render(self : PieChart) -> String {
     let cx = self.width / 2.0
     let chart_h = self.height - mt - mb - 40.0
     let cy = mt + chart_h / 2.0
-    let r = if self.width < self.height { self.width / 3.0 } else { chart_h / 2.5 }
+    let r = if self.width < self.height {
+      self.width / 3.0
+    } else {
+      chart_h / 2.5
+    }
 
     let tau : Float = 3.1415926535 * 2.0
 
@@ -198,7 +252,13 @@ pub fn PieChart::render(self : PieChart) -> String {
     for i = 0; i < num_slices; i = i + 1 {
       names.push(self.slices[i].name)
     }
-    let with_legend = with_slices + render_legend(names, self.width, self.height - 10.0, ChartConfig::default())
+    let with_legend = with_slices +
+      render_legend(
+        names,
+        self.width,
+        self.height - 10.0,
+        ChartConfig::default(),
+      )
 
     with_legend + svg_close()
   }

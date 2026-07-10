@@ -1,3 +1,4 @@
+///|
 pub(all) struct AreaChart {
   title : String
   x_labels : Array[String]
@@ -7,6 +8,7 @@ pub(all) struct AreaChart {
   config : ChartConfig
 }
 
+///|
 pub fn AreaChart::new() -> AreaChart {
   {
     title: "",
@@ -18,34 +20,48 @@ pub fn AreaChart::new() -> AreaChart {
   }
 }
 
+///|
 pub fn AreaChart::title(self : AreaChart, t : String) -> AreaChart {
   { ..self, title: t }
 }
 
-pub fn AreaChart::x_labels(self : AreaChart, labels : Array[String]) -> AreaChart {
+///|
+pub fn AreaChart::x_labels(
+  self : AreaChart,
+  labels : Array[String],
+) -> AreaChart {
   { ..self, x_labels: labels }
 }
 
+///|
 pub fn AreaChart::series(self : AreaChart, s : Series) -> AreaChart {
   let new_list = self.series_list
   new_list.push(s)
   { ..self, series_list: new_list }
 }
 
+///|
 pub fn AreaChart::width(self : AreaChart, w : Float) -> AreaChart {
   { ..self, width: w }
 }
 
+///|
 pub fn AreaChart::height(self : AreaChart, h : Float) -> AreaChart {
   { ..self, height: h }
 }
 
+///|
 pub fn AreaChart::config(self : AreaChart, c : ChartConfig) -> AreaChart {
   { ..self, config: c }
 }
 
 // Build area polygon points: line points + (last_x, baseline_y) + (first_x, baseline_y)
-fn build_area_polygon(pts_list : Array[(Float, Float)], baseline_y : Float) -> Array[(Float, Float)] {
+
+///|
+fn build_area_polygon(
+  pts_list : Array[(Float, Float)],
+  baseline_y : Float,
+) -> Array[(Float, Float)] {
   let area_pts : Array[(Float, Float)] = []
   for i = 0; i < pts_list.length(); i = i + 1 {
     area_pts.push(pts_list[i])
@@ -60,6 +76,8 @@ fn build_area_polygon(pts_list : Array[(Float, Float)], baseline_y : Float) -> A
 }
 
 // Build points array and render area fill + polyline + circles for a single series
+
+///|
 fn render_area_points(
   result : String,
   values : Array[Float],
@@ -82,7 +100,13 @@ fn render_area_points(
     let with_line = with_fill + polyline(pts_list, color, 2.0, "none")
     render_line_circles(with_line, pts_list, color, 0)
   } else {
-    let px = x_to_svg(Float::from_int(idx), Float::from_int(num_pts), width, ml, mr)
+    let px = x_to_svg(
+      Float::from_int(idx),
+      Float::from_int(num_pts),
+      width,
+      ml,
+      mr,
+    )
     let py = y_to_svg(values[idx], axis.y_min, axis.y_max, height, mt, mb)
     pts_list.push((px, py))
     render_area_points(
@@ -105,6 +129,8 @@ fn render_area_points(
 }
 
 // Render all series (outer loop over series_list)
+
+///|
 fn render_area_series(
   result : String,
   series_list : Array[Series],
@@ -127,20 +153,8 @@ fn render_area_series(
     let color = get_chart_color(config, si)
     let pts : Array[(Float, Float)] = []
     let with_series = render_area_points(
-      result,
-      values,
-      num_cat,
-      axis,
-      height,
-      mt,
-      mb,
-      width,
-      ml,
-      mr,
-      color,
-      baseline_y,
-      0,
-      pts,
+      result, values, num_cat, axis, height, mt, mb, width, ml, mr, color, baseline_y,
+      0, pts,
     )
     render_area_series(
       with_series,
@@ -160,6 +174,7 @@ fn render_area_series(
   }
 }
 
+///|
 pub fn AreaChart::render(self : AreaChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 60.0
@@ -174,7 +189,14 @@ pub fn AreaChart::render(self : AreaChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, mt - 12.0, self.title, self.config.title_font_size, "middle")
+    base +
+    text(
+      self.width / 2.0,
+      mt - 12.0,
+      self.title,
+      self.config.title_font_size,
+      "middle",
+    )
   } else {
     base
   }
@@ -194,8 +216,16 @@ pub fn AreaChart::render(self : AreaChart) -> String {
   )
 
   // X-axis baseline
-  let baseline_y = y_to_svg(axis.y_min, axis.y_min, axis.y_max, self.height, mt, mb)
-  let with_baseline = with_y_grid + line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
+  let baseline_y = y_to_svg(
+    axis.y_min,
+    axis.y_min,
+    axis.y_max,
+    self.height,
+    mt,
+    mb,
+  )
+  let with_baseline = with_y_grid +
+    line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
 
   // Area fills and lines
   let num_pts = self.x_labels.length()
@@ -239,7 +269,8 @@ pub fn AreaChart::render(self : AreaChart) -> String {
   for i = 0; i < self.series_list.length(); i = i + 1 {
     names.push(self.series_list[i].name)
   }
-  let with_legend = with_labels + render_legend(names, self.width, self.height - 10.0, self.config)
+  let with_legend = with_labels +
+    render_legend(names, self.width, self.height - 10.0, self.config)
 
   with_legend + svg_close()
 }

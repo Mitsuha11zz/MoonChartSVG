@@ -5,6 +5,8 @@
 // Uses MoonBit's built-in String.split() for simplicity.
 
 // Parse CSV text into (headers, rows)
+
+///|
 pub fn parse_csv(content : String) -> (Array[String], Array[Array[String]]) {
   let line_views = content.split("\n").to_array()
   // Collect non-empty lines
@@ -41,6 +43,8 @@ pub fn parse_csv(content : String) -> (Array[String], Array[Array[String]]) {
 // Parse CSV with numeric values, returning labels and Series objects.
 // Headers: "Label,Series1Name,Series2Name,..."
 // First column = category labels, remaining columns = data series.
+
+///|
 pub fn parse_csv_to_series(content : String) -> (Array[String], Array[Series]) {
   let (headers, rows) = parse_csv(content)
   let num_series = if headers.length() > 1 { headers.length() - 1 } else { 0 }
@@ -71,6 +75,8 @@ pub fn parse_csv_to_series(content : String) -> (Array[String], Array[Series]) {
 
 // Parse a string to Float. Handles integers, decimals (e.g. "3.14"),
 // and negative numbers (e.g. "-7"). Returns 0.0 on failure.
+
+///|
 pub fn parse_float_or_zero(s : String) -> Float {
   let len = s.length()
   if len == 0 {
@@ -80,6 +86,7 @@ pub fn parse_float_or_zero(s : String) -> Float {
   }
 }
 
+///|
 fn parse_float_impl(s : String, i : Int, len : Int) -> Float {
   // Check for negative sign
   let pair : (Float, Int) = if i < len && s[i] == 45 {
@@ -92,7 +99,13 @@ fn parse_float_impl(s : String, i : Int, len : Int) -> Float {
   let (int_val, after_int) = parse_int_digits(s, start, len, Float::from_int(0))
   if after_int < len && s[after_int] == 46 {
     let place_val : Float = Float::from_int(1) / Float::from_int(10)
-    let (frac_val, _) = parse_frac_digits(s, after_int + 1, len, Float::from_int(0), place_val)
+    let (frac_val, _) = parse_frac_digits(
+      s,
+      after_int + 1,
+      len,
+      Float::from_int(0),
+      place_val,
+    )
     sign * (int_val + frac_val)
   } else {
     sign * int_val
@@ -101,11 +114,18 @@ fn parse_float_impl(s : String, i : Int, len : Int) -> Float {
 
 // Parse a sequence of digit characters into a Float value.
 // Returns (accumulated value, next index).
-fn parse_int_digits(s : String, i : Int, len : Int, acc : Float) -> (Float, Int) {
+
+///|
+fn parse_int_digits(
+  s : String,
+  i : Int,
+  len : Int,
+  acc : Float,
+) -> (Float, Int) {
   if i >= len {
     (acc, i)
   } else {
-    let ch = s[i]  // UInt16 character code
+    let ch = s[i] // UInt16 character code
     if ch >= 48 && ch <= 57 {
       let digit = code_to_float(ch)
       parse_int_digits(s, i + 1, len, acc * Float::from_int(10) + digit)
@@ -117,7 +137,15 @@ fn parse_int_digits(s : String, i : Int, len : Int, acc : Float) -> (Float, Int)
 
 // Parse fractional digits after decimal point.
 // Returns (accumulated fraction, next index).
-fn parse_frac_digits(s : String, i : Int, len : Int, acc : Float, place : Float) -> (Float, Int) {
+
+///|
+fn parse_frac_digits(
+  s : String,
+  i : Int,
+  len : Int,
+  acc : Float,
+  place : Float,
+) -> (Float, Int) {
   if i >= len {
     (acc, i)
   } else {
@@ -133,16 +161,30 @@ fn parse_frac_digits(s : String, i : Int, len : Int, acc : Float, place : Float)
 }
 
 // Convert UInt16 character code for '0'-'9' to Float value.
+
+///|
 fn code_to_float(code : UInt16) -> Float {
-  if code == 48 { Float::from_int(0) }
-  else if code == 49 { Float::from_int(1) }
-  else if code == 50 { Float::from_int(2) }
-  else if code == 51 { Float::from_int(3) }
-  else if code == 52 { Float::from_int(4) }
-  else if code == 53 { Float::from_int(5) }
-  else if code == 54 { Float::from_int(6) }
-  else if code == 55 { Float::from_int(7) }
-  else if code == 56 { Float::from_int(8) }
-  else if code == 57 { Float::from_int(9) }
-  else { Float::from_int(0) }
+  if code == 48 {
+    Float::from_int(0)
+  } else if code == 49 {
+    Float::from_int(1)
+  } else if code == 50 {
+    Float::from_int(2)
+  } else if code == 51 {
+    Float::from_int(3)
+  } else if code == 52 {
+    Float::from_int(4)
+  } else if code == 53 {
+    Float::from_int(5)
+  } else if code == 54 {
+    Float::from_int(6)
+  } else if code == 55 {
+    Float::from_int(7)
+  } else if code == 56 {
+    Float::from_int(8)
+  } else if code == 57 {
+    Float::from_int(9)
+  } else {
+    Float::from_int(0)
+  }
 }

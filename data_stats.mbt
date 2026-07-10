@@ -1,6 +1,6 @@
+///|
 /// Data Statistics Module
 /// Utility functions for computing statistical properties of Float arrays.
-
 pub fn sum(values : Array[Float]) -> Float {
   fn aux(idx : Int, acc : Float) -> Float {
     if idx >= values.length() {
@@ -12,10 +12,12 @@ pub fn sum(values : Array[Float]) -> Float {
   aux(0, 0.0)
 }
 
+///|
 pub fn mean(values : Array[Float]) -> Float {
   sum(values) / Float::from_int(values.length())
 }
 
+///|
 pub fn min_value(values : Array[Float]) -> Float {
   fn aux(idx : Int, current_min : Float) -> Float {
     if idx >= values.length() {
@@ -29,6 +31,7 @@ pub fn min_value(values : Array[Float]) -> Float {
   aux(1, values[0])
 }
 
+///|
 pub fn max_value(values : Array[Float]) -> Float {
   fn aux(idx : Int, current_max : Float) -> Float {
     if idx >= values.length() {
@@ -43,7 +46,13 @@ pub fn max_value(values : Array[Float]) -> Float {
 }
 
 // Append remaining elements from source[from..] into target
-fn append_rest(source : Array[Float], from : Int, target : Array[Float]) -> Unit {
+
+///|
+fn append_rest(
+  source : Array[Float],
+  from : Int,
+  target : Array[Float],
+) -> Unit {
   if from < source.length() {
     target.push(source[from])
     append_rest(source, from + 1, target)
@@ -51,6 +60,8 @@ fn append_rest(source : Array[Float], from : Int, target : Array[Float]) -> Unit
 }
 
 // Insert a value into an already-sorted array in ascending order
+
+///|
 fn insert_sorted(sorted : Array[Float], value : Float) -> Array[Float] {
   fn aux(idx : Int, result : Array[Float]) -> Array[Float] {
     if idx >= sorted.length() {
@@ -69,7 +80,13 @@ fn insert_sorted(sorted : Array[Float], value : Float) -> Array[Float] {
 }
 
 // Recursively build a sorted array from unsorted input
-fn build_sorted(unsorted : Array[Float], idx : Int, sorted : Array[Float]) -> Array[Float] {
+
+///|
+fn build_sorted(
+  unsorted : Array[Float],
+  idx : Int,
+  sorted : Array[Float],
+) -> Array[Float] {
   if idx >= unsorted.length() {
     sorted
   } else {
@@ -78,10 +95,12 @@ fn build_sorted(unsorted : Array[Float], idx : Int, sorted : Array[Float]) -> Ar
   }
 }
 
+///|
 pub fn sort_asc(values : Array[Float]) -> Array[Float] {
   build_sorted(values, 0, [])
 }
 
+///|
 pub fn median(values : Array[Float]) -> Float {
   let sorted = sort_asc(values)
   let n = sorted.length()
@@ -96,6 +115,8 @@ pub fn median(values : Array[Float]) -> Float {
 }
 
 // Newton's method square root approximation
+
+///|
 fn sqrt_iter(val : Float, guess : Float, iter : Int) -> Float {
   if iter <= 0 {
     guess
@@ -105,6 +126,7 @@ fn sqrt_iter(val : Float, guess : Float, iter : Int) -> Float {
   }
 }
 
+///|
 fn sqrt_approx(x : Float) -> Float {
   if x <= 0.0 {
     0.0
@@ -113,6 +135,7 @@ fn sqrt_approx(x : Float) -> Float {
   }
 }
 
+///|
 pub fn std_dev(values : Array[Float]) -> Float {
   let m = mean(values)
   let n = values.length()

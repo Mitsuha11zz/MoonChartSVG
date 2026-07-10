@@ -1,3 +1,4 @@
+///|
 pub(all) struct StackedBarChart {
   title : String
   x_labels : Array[String]
@@ -7,6 +8,7 @@ pub(all) struct StackedBarChart {
   config : ChartConfig
 }
 
+///|
 pub fn StackedBarChart::new() -> StackedBarChart {
   {
     title: "",
@@ -18,33 +20,59 @@ pub fn StackedBarChart::new() -> StackedBarChart {
   }
 }
 
-pub fn StackedBarChart::title(self : StackedBarChart, t : String) -> StackedBarChart {
+///|
+pub fn StackedBarChart::title(
+  self : StackedBarChart,
+  t : String,
+) -> StackedBarChart {
   { ..self, title: t }
 }
 
-pub fn StackedBarChart::x_labels(self : StackedBarChart, labels : Array[String]) -> StackedBarChart {
+///|
+pub fn StackedBarChart::x_labels(
+  self : StackedBarChart,
+  labels : Array[String],
+) -> StackedBarChart {
   { ..self, x_labels: labels }
 }
 
-pub fn StackedBarChart::series(self : StackedBarChart, s : Series) -> StackedBarChart {
+///|
+pub fn StackedBarChart::series(
+  self : StackedBarChart,
+  s : Series,
+) -> StackedBarChart {
   let new_list = self.series_list
   new_list.push(s)
   { ..self, series_list: new_list }
 }
 
-pub fn StackedBarChart::width(self : StackedBarChart, w : Float) -> StackedBarChart {
+///|
+pub fn StackedBarChart::width(
+  self : StackedBarChart,
+  w : Float,
+) -> StackedBarChart {
   { ..self, width: w }
 }
 
-pub fn StackedBarChart::height(self : StackedBarChart, h : Float) -> StackedBarChart {
+///|
+pub fn StackedBarChart::height(
+  self : StackedBarChart,
+  h : Float,
+) -> StackedBarChart {
   { ..self, height: h }
 }
 
-pub fn StackedBarChart::config(self : StackedBarChart, c : ChartConfig) -> StackedBarChart {
+///|
+pub fn StackedBarChart::config(
+  self : StackedBarChart,
+  c : ChartConfig,
+) -> StackedBarChart {
   { ..self, config: c }
 }
 
 // Compute the sum of values across all series for a single category
+
+///|
 fn compute_category_sum(
   series_list : Array[Series],
   ci : Int,
@@ -52,14 +80,24 @@ fn compute_category_sum(
   acc : Float,
 ) -> Float {
   if si < series_list.length() {
-    compute_category_sum(series_list, ci, si + 1, acc + series_list[si].values[ci])
+    compute_category_sum(
+      series_list,
+      ci,
+      si + 1,
+      acc + series_list[si].values[ci],
+    )
   } else {
     acc
   }
 }
 
 // Find the maximum total (stacked) value across all categories
-fn find_max_category_sum(series_list : Array[Series], num_categories : Int) -> Float {
+
+///|
+fn find_max_category_sum(
+  series_list : Array[Series],
+  num_categories : Int,
+) -> Float {
   fn loop_category(ci : Int, max_sum : Float) -> Float {
     if ci < num_categories {
       let sum = compute_category_sum(series_list, ci, 0, 0.0)
@@ -73,6 +111,8 @@ fn find_max_category_sum(series_list : Array[Series], num_categories : Int) -> F
 }
 
 // Render stacked rectangles for a single category (recursive over series)
+
+///|
 fn render_category_stacked(
   acc : String,
   series_list : Array[Series],
@@ -113,6 +153,8 @@ fn render_category_stacked(
 }
 
 // Render stacked bars and x-axis labels (recursive over categories)
+
+///|
 fn render_stacked_bars_and_labels(
   acc : String,
   series_list : Array[Series],
@@ -144,22 +186,18 @@ fn render_stacked_bars_and_labels(
     let chart_h = height - mt - mb
     let bar_x = group_x + (group_w - bar_w) / 2.0
     let with_bars = render_category_stacked(
-      acc,
-      series_list,
-      num_series,
-      ci,
-      bar_x,
-      bar_w,
-      y_min,
-      y_max,
-      chart_h,
-      0,
-      baseline_y,
+      acc, series_list, num_series, ci, bar_x, bar_w, y_min, y_max, chart_h, 0, baseline_y,
       config,
     )
     let label_x = group_x + group_w / 2.0
     let with_label = with_bars +
-      text(label_x, baseline_y + 16.0, x_labels[ci], config.axis_font_size, "middle")
+      text(
+        label_x,
+        baseline_y + 16.0,
+        x_labels[ci],
+        config.axis_font_size,
+        "middle",
+      )
     render_stacked_bars_and_labels(
       with_label,
       series_list,
@@ -185,13 +223,18 @@ fn render_stacked_bars_and_labels(
   }
 }
 
+///|
 pub fn StackedBarChart::render(self : StackedBarChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 60.0
   let ml : Float = 60.0
   let mr : Float = 30.0
 
-  let num_categories = min_categories(self.series_list, self.x_labels.length(), 0)
+  let num_categories = min_categories(
+    self.series_list,
+    self.x_labels.length(),
+    0,
+  )
   let num_series = self.series_list.length()
 
   // Compute y-axis range: from 0 to max total sum across all categories
@@ -208,7 +251,13 @@ pub fn StackedBarChart::render(self : StackedBarChart) -> String {
   // Title
   let with_title = if self.title != "" {
     base +
-      text(self.width / 2.0, mt - 12.0, self.title, self.config.title_font_size, "middle")
+    text(
+      self.width / 2.0,
+      mt - 12.0,
+      self.title,
+      self.config.title_font_size,
+      "middle",
+    )
   } else {
     base
   }
@@ -231,7 +280,14 @@ pub fn StackedBarChart::render(self : StackedBarChart) -> String {
   )
 
   // X-axis baseline
-  let baseline_y = y_to_svg(axis.y_min, axis.y_min, axis.y_max, self.height, mt, mb)
+  let baseline_y = y_to_svg(
+    axis.y_min,
+    axis.y_min,
+    axis.y_max,
+    self.height,
+    mt,
+    mb,
+  )
   let with_baseline = with_y_grid +
     line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
 

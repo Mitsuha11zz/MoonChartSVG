@@ -1,3 +1,4 @@
+///|
 struct LineChart {
   title : String
   x_labels : Array[String]
@@ -7,6 +8,7 @@ struct LineChart {
   config : ChartConfig
 }
 
+///|
 pub fn LineChart::new() -> LineChart {
   {
     title: "",
@@ -18,38 +20,59 @@ pub fn LineChart::new() -> LineChart {
   }
 }
 
+///|
 pub fn LineChart::title(self : LineChart, t : String) -> LineChart {
   { ..self, title: t }
 }
 
-pub fn LineChart::x_labels(self : LineChart, labels : Array[String]) -> LineChart {
+///|
+pub fn LineChart::x_labels(
+  self : LineChart,
+  labels : Array[String],
+) -> LineChart {
   { ..self, x_labels: labels }
 }
 
+///|
 pub fn LineChart::series(self : LineChart, s : Series) -> LineChart {
   let new_list = self.series_list
   new_list.push(s)
   { ..self, series_list: new_list }
 }
 
+///|
 pub fn LineChart::width(self : LineChart, w : Float) -> LineChart {
   { ..self, width: w }
 }
 
+///|
 pub fn LineChart::height(self : LineChart, h : Float) -> LineChart {
   { ..self, height: h }
 }
 
+///|
 pub fn LineChart::config(self : LineChart, c : ChartConfig) -> LineChart {
   { ..self, config: c }
 }
 
 // Find data range across all series using nested recursion (same pattern as barchart)
+
+///|
 fn find_line_data_range(series_list : Array[Series]) -> (Float, Float) {
-  fn loop_series(i : Int, min : Float, max : Float, found : Bool) -> (Float, Float) {
+  fn loop_series(
+    i : Int,
+    min : Float,
+    max : Float,
+    found : Bool,
+  ) -> (Float, Float) {
     if i < series_list.length() {
-      let (new_min, new_max, new_found) =
-        find_line_values_range(series_list[i].values, 0, min, max, found)
+      let (new_min, new_max, new_found) = find_line_values_range(
+        series_list[i].values,
+        0,
+        min,
+        max,
+        found,
+      )
       loop_series(i + 1, new_min, new_max, new_found)
     } else {
       (min, max)
@@ -58,6 +81,7 @@ fn find_line_data_range(series_list : Array[Series]) -> (Float, Float) {
   loop_series(0, 0.0, 0.0, false)
 }
 
+///|
 fn find_line_values_range(
   values : Array[Float],
   j : Int,
@@ -71,8 +95,16 @@ fn find_line_values_range(
       find_line_values_range(
         values,
         j + 1,
-        if v < min { v } else { min },
-        if v > max { v } else { max },
+        if v < min {
+          v
+        } else {
+          min
+        },
+        if v > max {
+          v
+        } else {
+          max
+        },
         true,
       )
     } else {
@@ -84,7 +116,13 @@ fn find_line_values_range(
 }
 
 // Bounds check: minimum categories across all series to avoid index out of bounds
-fn min_line_categories(series_list : Array[Series], cur_min : Int, idx : Int) -> Int {
+
+///|
+fn min_line_categories(
+  series_list : Array[Series],
+  cur_min : Int,
+  idx : Int,
+) -> Int {
   if idx >= series_list.length() {
     cur_min
   } else {
@@ -95,6 +133,8 @@ fn min_line_categories(series_list : Array[Series], cur_min : Int, idx : Int) ->
 }
 
 // Render y-axis grid lines and labels recursively
+
+///|
 fn render_line_y_grid(
   result : String,
   axis : AxisLayout,
@@ -108,8 +148,21 @@ fn render_line_y_grid(
   config : ChartConfig,
 ) -> String {
   if idx < axis.ticks.length() {
-    let y_pos = y_to_svg(axis.ticks[idx], axis.y_min, axis.y_max, height, mt, mb)
-    let label = text(ml - 8.0, y_pos + 4.0, axis.tick_labels[idx], config.axis_font_size, "end")
+    let y_pos = y_to_svg(
+      axis.ticks[idx],
+      axis.y_min,
+      axis.y_max,
+      height,
+      mt,
+      mb,
+    )
+    let label = text(
+      ml - 8.0,
+      y_pos + 4.0,
+      axis.tick_labels[idx],
+      config.axis_font_size,
+      "end",
+    )
     let new_result = if config.show_grid {
       let grid_line = line(ml - 5.0, y_pos, width - mr, y_pos, "#e0e0e0", 1.0)
       result + grid_line + label
@@ -134,6 +187,8 @@ fn render_line_y_grid(
 }
 
 // Render circles for each data point in a series
+
+///|
 fn render_line_circles(
   result : String,
   pts : Array[(Float, Float)],
@@ -150,6 +205,8 @@ fn render_line_circles(
 }
 
 // Build points array and render polyline + circles for a single series
+
+///|
 fn render_line_points(
   result : String,
   values : Array[Float],
@@ -169,7 +226,13 @@ fn render_line_points(
     let with_poly = result + polyline(pts_list, color, 2.0, "none")
     render_line_circles(with_poly, pts_list, color, 0)
   } else {
-    let px = x_to_svg(Float::from_int(idx), Float::from_int(num_pts), width, ml, mr)
+    let px = x_to_svg(
+      Float::from_int(idx),
+      Float::from_int(num_pts),
+      width,
+      ml,
+      mr,
+    )
     let py = y_to_svg(values[idx], axis.y_min, axis.y_max, height, mt, mb)
     pts_list.push((px, py))
     render_line_points(
@@ -191,6 +254,8 @@ fn render_line_points(
 }
 
 // Render all series (outer loop over series_list)
+
+///|
 fn render_line_series(
   result : String,
   series_list : Array[Series],
@@ -212,19 +277,7 @@ fn render_line_series(
     let color = get_chart_color(config, si)
     let pts : Array[(Float, Float)] = []
     let with_series = render_line_points(
-      result,
-      values,
-      num_cat,
-      axis,
-      height,
-      mt,
-      mb,
-      width,
-      ml,
-      mr,
-      color,
-      0,
-      pts,
+      result, values, num_cat, axis, height, mt, mb, width, ml, mr, color, 0, pts,
     )
     render_line_series(
       with_series,
@@ -244,6 +297,8 @@ fn render_line_series(
 }
 
 // Render x-axis category labels recursively
+
+///|
 fn render_line_x_labels(
   result : String,
   x_labels : Array[String],
@@ -258,8 +313,20 @@ fn render_line_x_labels(
   if idx >= num_cat {
     result
   } else {
-    let px = x_to_svg(Float::from_int(idx), Float::from_int(num_cat), width, ml, mr)
-    let label = text(px, baseline_y + 16.0, x_labels[idx], config.axis_font_size, "middle")
+    let px = x_to_svg(
+      Float::from_int(idx),
+      Float::from_int(num_cat),
+      width,
+      ml,
+      mr,
+    )
+    let label = text(
+      px,
+      baseline_y + 16.0,
+      x_labels[idx],
+      config.axis_font_size,
+      "middle",
+    )
     render_line_x_labels(
       result + label,
       x_labels,
@@ -274,6 +341,7 @@ fn render_line_x_labels(
   }
 }
 
+///|
 pub fn LineChart::render(self : LineChart) -> String {
   let mt : Float = 40.0
   let mb : Float = 60.0
@@ -288,7 +356,14 @@ pub fn LineChart::render(self : LineChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, mt - 12.0, self.title, self.config.title_font_size, "middle")
+    base +
+    text(
+      self.width / 2.0,
+      mt - 12.0,
+      self.title,
+      self.config.title_font_size,
+      "middle",
+    )
   } else {
     base
   }
@@ -308,8 +383,16 @@ pub fn LineChart::render(self : LineChart) -> String {
   )
 
   // X-axis baseline
-  let baseline_y = y_to_svg(axis.y_min, axis.y_min, axis.y_max, self.height, mt, mb)
-  let with_baseline = with_y_grid + line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
+  let baseline_y = y_to_svg(
+    axis.y_min,
+    axis.y_min,
+    axis.y_max,
+    self.height,
+    mt,
+    mb,
+  )
+  let with_baseline = with_y_grid +
+    line(ml, baseline_y, self.width - mr, baseline_y, "#888888", 1.0)
 
   // Lines and circles — compute safe number of categories
   let num_pts = self.x_labels.length()
@@ -352,7 +435,8 @@ pub fn LineChart::render(self : LineChart) -> String {
   for i = 0; i < self.series_list.length(); i = i + 1 {
     names.push(self.series_list[i].name)
   }
-  let with_legend = with_labels + render_legend(names, self.width, self.height - 10.0, self.config)
+  let with_legend = with_labels +
+    render_legend(names, self.width, self.height - 10.0, self.config)
 
   with_legend + svg_close()
 }

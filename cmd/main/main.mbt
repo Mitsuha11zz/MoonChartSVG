@@ -1,6 +1,7 @@
 // MoonChartSVG CLI -- Demo Generator
 // Run: moon run cmd/main
 
+///|
 fn main {
   println("=== MoonChartSVG Demo Generator ===\n")
 
@@ -32,7 +33,7 @@ fn main {
 
   println("\n--- 3. CSV Data Demo ---")
   let csv = "Month,Sales\nJan,120\nFeb,200\nMar,150"
-  let (headers, rows) = @MoonChartSVG.parse_csv(csv)
+  let (_headers, rows) = @MoonChartSVG.parse_csv(csv)
   println("Parsed " + rows.length().to_string() + " rows from CSV")
 
   println("\n=== All demos complete ===")

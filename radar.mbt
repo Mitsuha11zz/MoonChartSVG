@@ -1,3 +1,4 @@
+///|
 pub(all) struct RadarChart {
   title : String
   axis_labels : Array[String]
@@ -8,6 +9,7 @@ pub(all) struct RadarChart {
   levels : Int
 }
 
+///|
 pub fn RadarChart::new() -> RadarChart {
   {
     title: "",
@@ -20,61 +22,91 @@ pub fn RadarChart::new() -> RadarChart {
   }
 }
 
+///|
 pub fn RadarChart::title(self : RadarChart, t : String) -> RadarChart {
   { ..self, title: t }
 }
 
-pub fn RadarChart::axis_labels(self : RadarChart, labels : Array[String]) -> RadarChart {
+///|
+pub fn RadarChart::axis_labels(
+  self : RadarChart,
+  labels : Array[String],
+) -> RadarChart {
   { ..self, axis_labels: labels }
 }
 
+///|
 pub fn RadarChart::series(self : RadarChart, s : Series) -> RadarChart {
   let new_list = self.series_list
   new_list.push(s)
   { ..self, series_list: new_list }
 }
 
+///|
 pub fn RadarChart::width(self : RadarChart, w : Float) -> RadarChart {
   { ..self, width: w }
 }
 
+///|
 pub fn RadarChart::height(self : RadarChart, h : Float) -> RadarChart {
   { ..self, height: h }
 }
 
+///|
 pub fn RadarChart::config(self : RadarChart, c : ChartConfig) -> RadarChart {
   { ..self, config: c }
 }
 
+///|
 pub fn RadarChart::levels(self : RadarChart, l : Int) -> RadarChart {
   { ..self, levels: l }
 }
 
 // Find max value across all series (for scaling data polygons)
-fn find_radar_max(series_list : Array[Series], idx : Int, max_val : Float, found : Bool) -> Float {
+
+///|
+fn find_radar_max(
+  series_list : Array[Series],
+  idx : Int,
+  max_val : Float,
+  found : Bool,
+) -> Float {
   if idx >= series_list.length() {
     max_val
   } else {
     let new_max = find_value_max(series_list[idx].values, 0, max_val, found)
-    find_radar_max(series_list, idx + 1, new_max, if found { true } else { new_max > 0.0 || max_val > 0.0 })
+    find_radar_max(
+      series_list,
+      idx + 1,
+      new_max,
+      if found {
+        true
+      } else {
+        new_max > 0.0 || max_val > 0.0
+      },
+    )
   }
 }
 
-fn find_value_max(values : Array[Float], j : Int, max_val : Float, found : Bool) -> Float {
+///|
+fn find_value_max(
+  values : Array[Float],
+  j : Int,
+  max_val : Float,
+  found : Bool,
+) -> Float {
   if j >= values.length() {
     max_val
   } else {
     let v = values[j]
-    let new_max = if found {
-      if v > max_val { v } else { max_val }
-    } else {
-      v
-    }
+    let new_max = if found { if v > max_val { v } else { max_val } } else { v }
     find_value_max(values, j + 1, new_max, true)
   }
 }
 
 // Build polygon points for a given radius (used for concentric grid rings)
+
+///|
 fn build_grid_polygon_points(
   result : Array[(Float, Float)],
   cx : Float,
@@ -92,11 +124,22 @@ fn build_grid_polygon_points(
     let px = cx + r * cos_approx(angle)
     let py = cy + r * sin_approx(angle)
     result.push((px, py))
-    build_grid_polygon_points(result, cx, cy, r, n, angle_step, start_angle, i + 1)
+    build_grid_polygon_points(
+      result,
+      cx,
+      cy,
+      r,
+      n,
+      angle_step,
+      start_angle,
+      i + 1,
+    )
   }
 }
 
 // Build polygon points for a data series (radius varies per axis)
+
+///|
 fn build_series_polygon_points(
   result : Array[(Float, Float)],
   cx : Float,
@@ -118,11 +161,24 @@ fn build_series_polygon_points(
     let px = cx + r * cos_approx(angle)
     let py = cy + r * sin_approx(angle)
     result.push((px, py))
-    build_series_polygon_points(result, cx, cy, values, max_val, chart_r, n, angle_step, start_angle, i + 1)
+    build_series_polygon_points(
+      result,
+      cx,
+      cy,
+      values,
+      max_val,
+      chart_r,
+      n,
+      angle_step,
+      start_angle,
+      i + 1,
+    )
   }
 }
 
 // Render concentric grid polygons
+
+///|
 fn render_radar_grid(
   result : String,
   cx : Float,
@@ -139,7 +195,9 @@ fn render_radar_grid(
   } else {
     let r = chart_r * Float::from_int(current_level) / Float::from_int(levels)
     let points : Array[(Float, Float)] = []
-    let grid_points = build_grid_polygon_points(points, cx, cy, r, n, angle_step, start_angle, 0)
+    let grid_points = build_grid_polygon_points(
+      points, cx, cy, r, n, angle_step, start_angle, 0,
+    )
     let poly = polygon(grid_points, "none", "#cccccc", 1.0)
     render_radar_grid(
       result + poly,
@@ -156,6 +214,8 @@ fn render_radar_grid(
 }
 
 // Render axis lines and labels
+
+///|
 fn render_radar_axes(
   result : String,
   cx : Float,
@@ -198,6 +258,8 @@ fn render_radar_axes(
 }
 
 // Render data series (filled polygons)
+
+///|
 fn render_radar_series(
   result : String,
   cx : Float,
@@ -218,16 +280,7 @@ fn render_radar_series(
     let color = get_chart_color(config, si)
     let points : Array[(Float, Float)] = []
     let series_points = build_series_polygon_points(
-      points,
-      cx,
-      cy,
-      values,
-      max_val,
-      chart_r,
-      n,
-      angle_step,
-      start_angle,
-      0,
+      points, cx, cy, values, max_val, chart_r, n, angle_step, start_angle, 0,
     )
     let poly = polygon(series_points, color, color, 2.0)
     render_radar_series(
@@ -246,12 +299,21 @@ fn render_radar_series(
   }
 }
 
+///|
 pub fn RadarChart::render(self : RadarChart) -> String {
   let n = self.axis_labels.length()
   if n == 0 {
     let base = svg_open(self.width, self.height)
     if self.title != "" {
-      return base + text(self.width / 2.0, 20.0, self.title, self.config.title_font_size, "middle") + svg_close()
+      return base +
+        text(
+          self.width / 2.0,
+          20.0,
+          self.title,
+          self.config.title_font_size,
+          "middle",
+        ) +
+        svg_close()
     } else {
       return base + svg_close()
     }
@@ -267,7 +329,7 @@ pub fn RadarChart::render(self : RadarChart) -> String {
   let legend_h : Float = 30.0
   let cx = self.width / 2.0
   let cy = title_h + (self.height - title_h - label_margin - legend_h) / 2.0
-  let max_r = if (self.width / 2.0 - label_margin) < (cy - title_h * 0.5) {
+  let max_r = if self.width / 2.0 - label_margin < cy - title_h * 0.5 {
     self.width / 2.0 - label_margin
   } else {
     cy - title_h * 0.5
@@ -278,7 +340,14 @@ pub fn RadarChart::render(self : RadarChart) -> String {
 
   // Title
   let with_title = if self.title != "" {
-    base + text(self.width / 2.0, 20.0, self.title, self.config.title_font_size, "middle")
+    base +
+    text(
+      self.width / 2.0,
+      20.0,
+      self.title,
+      self.config.title_font_size,
+      "middle",
+    )
   } else {
     base
   }
@@ -335,7 +404,8 @@ pub fn RadarChart::render(self : RadarChart) -> String {
   for i = 0; i < self.series_list.length(); i = i + 1 {
     names.push(self.series_list[i].name)
   }
-  let with_legend = with_series + render_legend(names, self.width, self.height - 10.0, self.config)
+  let with_legend = with_series +
+    render_legend(names, self.width, self.height - 10.0, self.config)
 
   with_legend + svg_close()
 }
