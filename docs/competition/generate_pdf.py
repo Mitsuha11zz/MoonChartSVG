@@ -138,15 +138,15 @@ pdf.sec("三", "核心功能范围")
 pdf.sub("图表类型（9种）")
 pdf.t_header(["图表", "文件", "行数", "核心特性"], [32, 36, 20, 58])
 for row in [
-    ("BarChart 柱状图", "barchart.mbt", "333", "分组柱状图，多系列并排，Y轴自动缩放"),
-    ("LineChart 折线图", "linechart.mbt", "358", "多系列折线+圆圈标记，X轴标签"),
-    ("PieChart 饼图", "piechart.mbt", "205", "弧形切片，百分比标注，Taylor级数sin/cos"),
-    ("ScatterChart 散点图", "scatter.mbt", "336", "X-Y数据点，可配置点大小，轴标签"),
-    ("RadarChart 雷达图", "radar.mbt", "341", "多轴对比，同心网格线，填充多边形"),
-    ("AreaChart 面积图", "areachart.mbt", "245", "折线下方填充区域，polygon+polyline叠加"),
-    ("StackedBarChart 堆叠柱状图", "stackedbar.mbt", "279", "系列垂直堆叠，按类别总和高计算"),
-    ("HorBarChart 水平柱状图", "horbarchart.mbt", "363", "横向柱体，横向坐标轴计算"),
-    ("DonutChart 环形图", "donutchart.mbt", "177", "饼图中心镂空，hole_ratio可调"),
+    ("BarChart 柱状图", "barchart.mbt", "403", "分组柱状图，多系列并排，Y轴自动缩放"),
+    ("LineChart 折线图", "linechart.mbt", "442", "多系列折线+圆圈标记，X轴标签"),
+    ("PieChart 饼图", "piechart.mbt", "265", "弧形切片，百分比标注，Taylor级数sin/cos"),
+    ("ScatterChart 散点图", "scatter.mbt", "436", "X-Y数据点，可配置点大小，轴标签"),
+    ("RadarChart 雷达图", "radar.mbt", "411", "多轴对比，同心网格线，填充多边形"),
+    ("AreaChart 面积图", "areachart.mbt", "276", "折线下方填充区域，polygon+polyline叠加"),
+    ("StackedBarChart 堆叠柱状图", "stackedbar.mbt", "335", "系列垂直堆叠，按类别总和高计算"),
+    ("HorBarChart 水平柱状图", "horbarchart.mbt", "380", "横向柱体，横向坐标轴计算"),
+    ("DonutChart 环形图", "donutchart.mbt", "228", "饼图中心镂空，hole_ratio可调"),
 ]:
     pdf.t_row(row, [32, 36, 20, 58])
 pdf.ln(1)
@@ -189,17 +189,17 @@ pdf.sec("五", "项目规模与进度")
 
 pdf.t_header(["模块", "源码行", "说明"], [48, 24, 90])
 for row in [
-    ("图表实现（9种）", "2,637", "Bar/Line/Pie/Scatter/Radar/Area/Stacked/Hor/Donut"),
-    ("基础设施", "283", "axes/color/config/legend/svg_util"),
-    ("工具模块", "502", "csv_reader/data_stats/demo"),
-    ("测试代码", "546", "moonchart_test + moonchart_wbtest（60个测试）"),
-    ("Demo/CLI/配置", "79", "cmd/main + moonchart.mbt"),
-    ("合计", "4,047", "60测试全通过，19次有效提交"),
+    ("图表实现（9种）", "3,176", "Bar/Line/Pie/Scatter/Radar/Area/Stacked/Hor/Donut"),
+    ("基础设施", "643", "axes/color/config/legend/svg_util/palette/theme"),
+    ("工具模块", "619", "csv_reader/data_stats/demo"),
+    ("测试代码", "779", "moonchart_test + moonchart_wbtest（78个测试）"),
+    ("Demo/CLI/配置", "73", "cmd/main + moonchart.mbt"),
+    ("合计", "5,290", "78测试全通过，30次有效提交"),
 ]:
     pdf.t_row(row, [48, 24, 90], bold=(row[0] == "合计"))
 pdf.ln(1)
 
-pdf.body("CI 配置完成（GitHub Actions），README 完整（安装、快速开始、API参考），双仓库推送（GitHub + GitLink）。")
+pdf.body("CI（GitHub Actions）含 moon check --deny-warn + moon fmt --check + moon info + moon test --deny-warn，已发布至 mooncakes.io（moon add Mitsuha11zz/MoonChartSVG）。")
 
 # ===== 六 =====
 pdf.sec("六", "适用场景")
