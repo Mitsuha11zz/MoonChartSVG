@@ -108,7 +108,7 @@ for item in (
 
 pdf.section("四、工程证据")
 for item in (
-    "25 个 MoonBit 文件，约 5,280 行；9 种图表；93 个测试；37 次已有提交。",
+    "25 个 MoonBit 文件，约 5,280 行；9 种图表；93 个测试；30+ 次有效提交。",
     "CI 执行 moon check、moon fmt --check、moon info、四后端 moon test 和覆盖率分析。",
     "提供 README、可执行文档测试、CLI 演示、开发报告、验收清单和一页式申报书。",
 ):

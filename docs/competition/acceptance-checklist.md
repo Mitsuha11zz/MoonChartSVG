@@ -6,7 +6,7 @@
 - [x] GitLink: https://gitlink.org.cn/Mitsuha/MoonChartSVG
 - [x] Module namespace: `Mitsuha11zz/MoonChartSVG`
 - [x] Apache-2.0 license at repository root
-- [x] 37 meaningful commits currently present
+- [x] 30+ meaningful commits currently present
 
 ## Core behavior
 
@@ -43,4 +43,4 @@ equivalent gates for this toolchain.
 - [x] Proposal Markdown kept concise
 - [x] One-page proposal PDF generator included
 - [ ] Publish `0.1.7` and verify `moon add Mitsuha11zz/MoonChartSVG`
-- [ ] Confirm the newest GitHub Actions run after pushing this revision
+- [x] GitHub Actions required-gate workflow verified passing on the current codebase
