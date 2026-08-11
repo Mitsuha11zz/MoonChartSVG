@@ -73,7 +73,7 @@ pub fn Theme::warm() -> Theme {
 ///|
 pub fn Theme::to_config(self : Theme) -> ChartConfig {
   ChartConfig::{
-    colors: self.colors,
+    colors: self.colors.copy(),
     show_grid: true,
     title_font_size: 16,
     axis_font_size: 11,

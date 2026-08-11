@@ -33,7 +33,7 @@ pub fn StackedBarChart::x_labels(
   self : StackedBarChart,
   labels : Array[String],
 ) -> StackedBarChart {
-  { ..self, x_labels: labels }
+  { ..self, x_labels: labels.copy() }
 }
 
 ///|
@@ -41,7 +41,7 @@ pub fn StackedBarChart::series(
   self : StackedBarChart,
   s : Series,
 ) -> StackedBarChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -67,7 +67,7 @@ pub fn StackedBarChart::config(
   self : StackedBarChart,
   c : ChartConfig,
 ) -> StackedBarChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 // Compute the sum of values across all series for a single category

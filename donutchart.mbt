@@ -31,7 +31,7 @@ pub fn DonutChart::slice(
   name : String,
   value : Float,
 ) -> DonutChart {
-  let new_slices = self.slices
+  let new_slices = self.slices.copy()
   new_slices.push(Slice::new(name, value))
   { ..self, slices: new_slices }
 }
@@ -48,7 +48,7 @@ pub fn DonutChart::height(self : DonutChart, h : Float) -> DonutChart {
 
 ///|
 pub fn DonutChart::config(self : DonutChart, c : ChartConfig) -> DonutChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 ///|
@@ -128,6 +128,19 @@ fn render_donut_slices(
 ) -> String {
   if idx >= slices.length() {
     result
+  } else if slices[idx].value <= 0.0 {
+    render_donut_slices(
+      result,
+      slices,
+      total,
+      cx,
+      cy,
+      outer_r,
+      inner_r,
+      tau,
+      idx + 1,
+      start_angle,
+    )
   } else {
     let fraction = slices[idx].value / total
     let sweep = fraction * tau
@@ -184,6 +197,10 @@ pub fn DonutChart::render(self : DonutChart) -> String {
     // Calculate total value
     let total = sum_slice_values(self.slices, 0, 0.0)
 
+    if total <= 0.0 {
+      return with_title + svg_close()
+    }
+
     // Donut layout: center the donut in the remaining area
     let cx = self.width / 2.0
     let chart_h = self.height - mt - mb - 40.0
@@ -193,7 +210,14 @@ pub fn DonutChart::render(self : DonutChart) -> String {
     } else {
       chart_h / 2.5
     }
-    let inner_r = outer_r * self.hole_ratio
+    let safe_hole_ratio : Float = if self.hole_ratio < 0.0 {
+      0.0
+    } else if self.hole_ratio > 0.95 {
+      0.95
+    } else {
+      self.hole_ratio
+    }
+    let inner_r = outer_r * safe_hole_ratio
 
     let tau : Float = 3.1415926535 * 2.0
 

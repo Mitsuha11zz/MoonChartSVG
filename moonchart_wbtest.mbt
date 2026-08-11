@@ -716,3 +716,84 @@ test "piechart builder chain" {
   let svg = c.render()
   assert_eq(svg.contains("Pie"), true)
 }
+
+///|
+test "trigonometry preserves all cosine quadrants" {
+  let pi : Float = 3.1415926535
+  let at_zero = cos_approx(0.0)
+  let at_half_pi = cos_approx(pi / 2.0)
+  let at_pi = cos_approx(pi)
+  let at_three_half_pi = cos_approx(pi * 1.5)
+  assert_eq(at_zero > 0.99, true)
+  assert_eq(at_half_pi > -0.01 && at_half_pi < 0.01, true)
+  assert_eq(at_pi < -0.99, true)
+  assert_eq(at_three_half_pi > -0.01 && at_three_half_pi < 0.01, true)
+  let (second_x, _) = polar_to_cartesian(100.0, 100.0, 50.0, pi * 0.75)
+  let (fourth_x, _) = polar_to_cartesian(100.0, 100.0, 50.0, pi * 1.75)
+  assert_eq(second_x < 100.0, true)
+  assert_eq(fourth_x > 100.0, true)
+}
+
+///|
+test "legend wraps without negative coordinates" {
+  let legend = render_legend(
+    ["Chrome", "Safari", "Edge", "Firefox", "Opera", "Other"],
+    500.0,
+    390.0,
+    ChartConfig::default(),
+  )
+  assert_eq(legend.contains("x=\"-"), false)
+  assert_eq(legend.contains("y=\"372\""), true)
+  assert_eq(legend.contains("y=\"390\""), true)
+}
+
+///|
+test "dashboard embeds complete inner svg" {
+  let svg = generate_demo_dashboard()
+  assert_eq(svg.contains("</svg</g>"), false)
+  assert_eq(svg.contains("<g transform=\"translate("), true)
+  assert_eq(svg.has_suffix("</svg>"), true)
+}
+
+///|
+test "svg and html escape user supplied text" {
+  let svg = text(10.0, 20.0, "A&B <C> \"D\" 'E'", 12, "middle")
+  assert_eq(svg.contains("A&amp;B &lt;C&gt; &quot;D&quot; &apos;E&apos;"), true)
+  let html = wrap_html_multi(["<svg></svg>"], ["Sales <Q1> & \"Q2\""])
+  assert_eq(html.contains("Sales &lt;Q1&gt; &amp; &quot;Q2&quot;"), true)
+  assert_eq(html.contains("max-width: 100%;"), true)
+}
+
+///|
+test "pie and donut handle non-positive totals" {
+  let pie = PieChart::new().slice("zero", 0.0).slice("negative", -5.0).render()
+  let donut = DonutChart::new()
+    .slice("zero", 0.0)
+    .slice("negative", -5.0)
+    .render()
+  assert_eq(pie.contains("<path"), false)
+  assert_eq(donut.contains("<path"), false)
+  assert_eq(pie.contains("NaN"), false)
+  assert_eq(donut.contains("NaN"), false)
+}
+
+///|
+test "builder methods isolate mutable input arrays" {
+  let values : Array[Float] = [1.0]
+  let series = Series::new("S", values)
+  values.push(2.0)
+  assert_eq(series.values.length(), 1)
+
+  let labels = ["A"]
+  let base = BarChart::new().x_labels(labels)
+  let extended = base.series(series)
+  labels.push("B")
+  assert_eq(base.x_labels.length(), 1)
+  assert_eq(base.series_list.length(), 0)
+  assert_eq(extended.series_list.length(), 1)
+
+  let pie = PieChart::new()
+  let pie_with_slice = pie.slice("A", 1.0)
+  assert_eq(pie.slices.length(), 0)
+  assert_eq(pie_with_slice.slices.length(), 1)
+}

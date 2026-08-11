@@ -27,12 +27,12 @@ pub fn BarChart::title(self : BarChart, t : String) -> BarChart {
 
 ///|
 pub fn BarChart::x_labels(self : BarChart, labels : Array[String]) -> BarChart {
-  { ..self, x_labels: labels }
+  { ..self, x_labels: labels.copy() }
 }
 
 ///|
 pub fn BarChart::series(self : BarChart, s : Series) -> BarChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -49,7 +49,7 @@ pub fn BarChart::height(self : BarChart, h : Float) -> BarChart {
 
 ///|
 pub fn BarChart::config(self : BarChart, c : ChartConfig) -> BarChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 // Find data range across all series

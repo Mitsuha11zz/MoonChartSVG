@@ -26,7 +26,7 @@ pub fn wrap_html_multi(svgs : Array[String], titles : Array[String]) -> String {
     ".dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }\n" +
     ".chart-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 16px; }\n" +
     ".chart-card h2 { color: #555; margin: 0 0 12px 0; font-size: 14px; }\n" +
-    ".chart-card svg { max-width: 100%%; height: auto; }\n" +
+    ".chart-card svg { max-width: 100%; height: auto; }\n" +
     "</style>\n</head>\n<body>\n<h1>MoonChartSVG Dashboard</h1>\n<div class=\"dashboard\">\n"
   wrap_html_cards(result, svgs, titles, 0) + "</div>\n</body>\n</html>"
 }
@@ -47,7 +47,7 @@ fn wrap_html_cards(
       "Chart " + idx.to_string()
     }
     let card = "<div class=\"chart-card\">\n<h2>" +
-      title +
+      escape_xml(title) +
       "</h2>\n" +
       svgs[idx] +
       "\n</div>\n"
@@ -65,7 +65,7 @@ pub fn wrap_html_styled(
 ) -> String {
   "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n" +
   "<title>" +
-  title +
+  escape_xml(title) +
   "</title>\n<style>\n" +
   "body { margin: 40px; background: " +
   bg_color +

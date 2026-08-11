@@ -30,12 +30,12 @@ pub fn AreaChart::x_labels(
   self : AreaChart,
   labels : Array[String],
 ) -> AreaChart {
-  { ..self, x_labels: labels }
+  { ..self, x_labels: labels.copy() }
 }
 
 ///|
 pub fn AreaChart::series(self : AreaChart, s : Series) -> AreaChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -52,7 +52,7 @@ pub fn AreaChart::height(self : AreaChart, h : Float) -> AreaChart {
 
 ///|
 pub fn AreaChart::config(self : AreaChart, c : ChartConfig) -> AreaChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 // Build area polygon points: line points + (last_x, baseline_y) + (first_x, baseline_y)

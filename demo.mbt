@@ -227,15 +227,13 @@ fn embed_chart(svg_str : String, dx : Float, dy : Float) -> String {
 }
 
 // Extract content between the opening <svg...> and closing </svg>.
-// Uses String.split() for all string manipulation.
 
 ///|
 fn extract_svg_inner(svg_str : String) -> String {
-  // Step 1: Split on '>' to skip the opening <svg ...> tag.
-  // Everything after the first '>' is the inner content (plus closing tag).
   let after_open = skip_first_gt(svg_str)
-  // Step 2: Remove the trailing '</svg>' close tag.
-  let parts = after_open.split("</svg>").to_array()
+  // `skip_first_gt` rejoins split segments and intentionally does not restore
+  // the final delimiter, so match the closing tag before its final `>`.
+  let parts = after_open.split("</svg").to_array()
   if parts.length() >= 1 {
     parts[0].to_owned()
   } else {

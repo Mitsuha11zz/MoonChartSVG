@@ -6,7 +6,7 @@ pub(all) struct Series {
 
 ///|
 pub fn Series::new(name : String, values : Array[Float]) -> Series {
-  { name, values }
+  { name, values: values.copy() }
 }
 
 ///|

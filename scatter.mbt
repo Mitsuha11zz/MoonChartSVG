@@ -47,7 +47,7 @@ pub fn ScatterChart::y_label(
 
 ///|
 pub fn ScatterChart::series(self : ScatterChart, s : Series) -> ScatterChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -67,7 +67,7 @@ pub fn ScatterChart::config(
   self : ScatterChart,
   c : ChartConfig,
 ) -> ScatterChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 ///|

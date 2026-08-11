@@ -30,12 +30,12 @@ pub fn HorBarChart::y_labels(
   self : HorBarChart,
   labels : Array[String],
 ) -> HorBarChart {
-  { ..self, y_labels: labels }
+  { ..self, y_labels: labels.copy() }
 }
 
 ///|
 pub fn HorBarChart::series(self : HorBarChart, s : Series) -> HorBarChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -52,7 +52,7 @@ pub fn HorBarChart::height(self : HorBarChart, h : Float) -> HorBarChart {
 
 ///|
 pub fn HorBarChart::config(self : HorBarChart, c : ChartConfig) -> HorBarChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 // Find max value across all series

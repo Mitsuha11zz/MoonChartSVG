@@ -1,85 +1,70 @@
 # MoonChartSVG
 
-纯 MoonBit 实现的 SVG 图表生成库，支持9种图表类型，零依赖，Builder API 设计。
+MoonChartSVG is a zero-dependency SVG chart library written in pure MoonBit.
+It provides builder APIs for bar, line, area, scatter, pie, donut, radar,
+stacked bar, and horizontal bar charts.
 
-## Features
+## Install
 
-- **Bar Chart** — grouped bars with multiple series
-- **Line Chart** — polylines with data point markers
-- **Pie Chart** — arc slices with percentage labels
-- **Auto-scaling** — automatic Y-axis range and tick calculation
-- **Tableau 10 colors** — professional color palette by default
-- **Zero dependencies** — pure MoonBit, SVG string output
-
-## Installation
-
-```
+```bash
 moon add Mitsuha11zz/MoonChartSVG
 ```
 
 ## Quick Start
 
-### Bar Chart
-
 ```moonbit
-let chart = BarChart::new()
+let svg = @MoonChartSVG.BarChart::new()
   .title("Monthly Sales")
   .x_labels(["Jan", "Feb", "Mar", "Apr"])
-  .series(Series::new("Product A", [120.0, 200.0, 150.0, 180.0]))
-  .series(Series::new("Product B", [80.0, 130.0, 170.0, 140.0]))
-let svg : String = chart.render()
+  .series(@MoonChartSVG.Series::new("Product A", [120.0, 200.0, 150.0, 180.0]))
+  .series(@MoonChartSVG.Series::new("Product B", [80.0, 130.0, 170.0, 140.0]))
+  .render()
 ```
 
-### Line Chart
+`render()` returns a complete standalone `<svg>` document. It can be written
+to a file, embedded in HTML, or composed with the included dashboard helpers.
 
-```moonbit
-let chart = LineChart::new()
-  .title("Revenue Trend")
-  .x_labels(["Q1", "Q2", "Q3", "Q4"])
-  .series(Series::new("Revenue", [50.0, 80.0, 120.0, 200.0]))
-let svg : String = chart.render()
+## Highlights
+
+- Nine chart types with a consistent builder API
+- Pure SVG output with no browser or runtime dependency
+- Automatic axis scaling and a built-in Tableau-style palette
+- Responsive multi-row legends for narrow canvases
+- XML escaping for titles, labels, colors, and generated attributes
+- Stable pie, donut, and radar coordinates across all angle quadrants
+- Defensive copies in builders so earlier chart values stay unchanged
+- Graceful handling of empty and non-positive pie or donut data
+- CSV parsing, descriptive statistics, themes, and HTML wrappers
+
+## Demo
+
+```bash
+moon run cmd/main
 ```
 
-### Pie Chart
+The command prints complete examples for every chart type, a composed SVG
+dashboard, theme usage, and CSV-driven data.
 
-```moonbit
-let chart = PieChart::new()
-  .title("Market Share")
-  .slice("Desktop", 55.0)
-  .slice("Mobile", 35.0)
-  .slice("Tablet", 10.0)
-let svg : String = chart.render()
+## Validation
+
+```bash
+moon check --deny-warn --target all
+moon fmt --check
+moon info
+moon test --deny-warn --target all
 ```
 
-## API Reference
+The current MoonBit CLI does not accept `--deny-warn` for `moon fmt` or
+`moon info`; `moon fmt --check` and a clean `moon info` run are the supported
+equivalent checks.
 
-### Data Types
+## Data Behavior
 
-- `Series::new(name: String, values: Array[Float]) -> Series`
-- `Slice::new(name: String, value: Float) -> Slice`
-
-### BarChart / LineChart
-
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `new()` | Chart | Create with defaults (800x400) |
-| `title(t)` | Chart | Set chart title |
-| `x_labels(labels)` | Chart | Set X-axis category labels |
-| `series(s)` | Chart | Add a data series |
-| `width(w)` | Chart | Set chart width |
-| `height(h)` | Chart | Set chart height |
-| `render()` | String | Generate SVG output |
-
-### PieChart
-
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `new()` | Chart | Create with defaults (500x400) |
-| `title(t)` | Chart | Set chart title |
-| `slice(name, value)` | Chart | Add a pie slice |
-| `width(w)` | Chart | Set chart width |
-| `height(h)` | Chart | Set chart height |
-| `render()` | String | Generate SVG output |
+- Pie and donut slices with values less than or equal to zero are ignored.
+- A pie or donut whose positive total is zero renders an empty SVG chart.
+- Donut hole ratios are clamped to the range `0.0..0.95`.
+- Radar values missing from a series are rendered as zero.
+- User-provided SVG text and attributes are XML escaped.
 
 ## License
 

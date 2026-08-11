@@ -19,6 +19,11 @@ pub fn ChartConfig::default() -> ChartConfig {
 }
 
 ///|
+fn copy_chart_config(config : ChartConfig) -> ChartConfig {
+  { ..config, colors: config.colors.copy() }
+}
+
+///|
 pub fn get_chart_color(config : ChartConfig, index : Int) -> String {
   if config.colors.length() > 0 {
     config.colors[index % config.colors.length()]

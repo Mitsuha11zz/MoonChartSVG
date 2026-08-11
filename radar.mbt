@@ -32,12 +32,12 @@ pub fn RadarChart::axis_labels(
   self : RadarChart,
   labels : Array[String],
 ) -> RadarChart {
-  { ..self, axis_labels: labels }
+  { ..self, axis_labels: labels.copy() }
 }
 
 ///|
 pub fn RadarChart::series(self : RadarChart, s : Series) -> RadarChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -54,7 +54,7 @@ pub fn RadarChart::height(self : RadarChart, h : Float) -> RadarChart {
 
 ///|
 pub fn RadarChart::config(self : RadarChart, c : ChartConfig) -> RadarChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 ///|

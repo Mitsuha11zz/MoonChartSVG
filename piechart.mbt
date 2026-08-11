@@ -22,7 +22,7 @@ pub fn PieChart::slice(
   name : String,
   value : Float,
 ) -> PieChart {
-  let new_slices = self.slices
+  let new_slices = self.slices.copy()
   new_slices.push(Slice::new(name, value))
   { ..self, slices: new_slices }
 }
@@ -76,18 +76,7 @@ fn sin_approx(x : Float) -> Float {
 ///|
 fn cos_approx(x : Float) -> Float {
   let pi : Float = 3.1415926535
-  let x_norm = normalize_angle(x)
-  let sign : Float = if x_norm > pi { -1.0 } else { 1.0 }
-  let x_reduced : Float = if x_norm > pi { x_norm - pi } else { x_norm }
-  let x_final = if x_reduced > pi / 2.0 { pi - x_reduced } else { x_reduced }
-  let x2 = x_final * x_final
-  let x4 = x2 * x2
-  let x6 = x4 * x2
-  let one : Float = 1.0
-  let two : Float = 2.0
-  let f24 : Float = 24.0
-  let f720 : Float = 720.0
-  sign * (one - x2 / two + x4 / f24 - x6 / f720)
+  sin_approx(x + pi / 2.0)
 }
 
 ///|
@@ -142,7 +131,8 @@ fn sum_slice_values(slices : Array[Slice], idx : Int, acc : Float) -> Float {
   if idx >= slices.length() {
     acc
   } else {
-    sum_slice_values(slices, idx + 1, acc + slices[idx].value)
+    let value = if slices[idx].value > 0.0 { slices[idx].value } else { 0.0 }
+    sum_slice_values(slices, idx + 1, acc + value)
   }
 }
 
@@ -171,6 +161,18 @@ fn render_pie_slices(
 ) -> String {
   if idx >= slices.length() {
     result
+  } else if slices[idx].value <= 0.0 {
+    render_pie_slices(
+      result,
+      slices,
+      total,
+      cx,
+      cy,
+      r,
+      tau,
+      idx + 1,
+      start_angle,
+    )
   } else {
     let fraction = slices[idx].value / total
     let sweep = fraction * tau
@@ -221,6 +223,10 @@ pub fn PieChart::render(self : PieChart) -> String {
   } else {
     // Calculate total value
     let total = sum_slice_values(self.slices, 0, 0.0)
+
+    if total <= 0.0 {
+      return with_title + svg_close()
+    }
 
     // Pie layout: center the pie in the remaining area
     let cx = self.width / 2.0

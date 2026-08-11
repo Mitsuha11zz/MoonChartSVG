@@ -30,12 +30,12 @@ pub fn LineChart::x_labels(
   self : LineChart,
   labels : Array[String],
 ) -> LineChart {
-  { ..self, x_labels: labels }
+  { ..self, x_labels: labels.copy() }
 }
 
 ///|
 pub fn LineChart::series(self : LineChart, s : Series) -> LineChart {
-  let new_list = self.series_list
+  let new_list = self.series_list.copy()
   new_list.push(s)
   { ..self, series_list: new_list }
 }
@@ -52,7 +52,7 @@ pub fn LineChart::height(self : LineChart, h : Float) -> LineChart {
 
 ///|
 pub fn LineChart::config(self : LineChart, c : ChartConfig) -> LineChart {
-  { ..self, config: c }
+  { ..self, config: copy_chart_config(c) }
 }
 
 // Find data range across all series using nested recursion (same pattern as barchart)

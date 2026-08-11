@@ -1,9 +1,25 @@
 ///|
+fn escape_xml(value : String) -> String {
+  let result = StringBuilder(size_hint=value.length())
+  for ch in value {
+    match ch {
+      '&' => result.write_string("&amp;")
+      '<' => result.write_string("&lt;")
+      '>' => result.write_string("&gt;")
+      '"' => result.write_string("&quot;")
+      '\'' => result.write_string("&apos;")
+      _ => result.write_char(ch)
+    }
+  }
+  result.to_string()
+}
+
+///|
 fn attrs_to_string(attrs : Array[(String, String)]) -> String {
   fn aux(i : Int, acc : String) -> String {
     if i < attrs.length() {
       let (k, v) = attrs[i]
-      aux(i + 1, acc + " " + k + "=\"" + v + "\"")
+      aux(i + 1, acc + " " + k + "=\"" + escape_xml(v) + "\"")
     } else {
       acc
     }
@@ -69,7 +85,7 @@ pub fn text(
       ("font-family", "sans-serif"),
       ("text-anchor", anchor),
     ],
-    content,
+    escape_xml(content),
   )
 }
 
