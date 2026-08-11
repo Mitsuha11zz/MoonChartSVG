@@ -1,40 +1,121 @@
-// CSV Reader -- Parse comma-separated data with headers
+// CSV Reader -- Parse comma-separated data with headers.
 //
-// Supports newline-delimited rows with comma-separated fields.
-// First row is treated as headers; remaining rows are data.
-// Uses MoonBit's built-in String.split() for simplicity.
+// Supports quoted fields, escaped quotes, embedded commas/newlines, and
+// both LF and CRLF record separators.
+
+///|
+priv enum CsvState {
+  Unquoted
+  Quoted
+  AfterQuote
+}
+
+///|
+fn push_csv_field(row : Array[String], field : StringBuilder) -> StringBuilder {
+  row.push(field.to_string())
+  StringBuilder()
+}
+
+///|
+fn push_csv_record(
+  records : Array[Array[String]],
+  row : Array[String],
+) -> Array[String] {
+  if !(row.length() == 1 && row[0] == "") {
+    records.push(row)
+  }
+  []
+}
+
+///|
+fn parse_csv_records(content : String) -> Array[Array[String]] {
+  let records : Array[Array[String]] = []
+  let mut row : Array[String] = []
+  let mut field = StringBuilder()
+  let mut state = CsvState::Unquoted
+  let mut ended_with_record_separator = false
+
+  for ch in content {
+    match state {
+      Unquoted =>
+        match ch {
+          ',' => {
+            field = push_csv_field(row, field)
+            ended_with_record_separator = false
+          }
+          '\n' => {
+            field = push_csv_field(row, field)
+            row = push_csv_record(records, row)
+            ended_with_record_separator = true
+          }
+          '\r' => ()
+          '"' =>
+            if field.to_string() == "" {
+              state = Quoted
+              ended_with_record_separator = false
+            } else {
+              field.write_char(ch)
+              ended_with_record_separator = false
+            }
+          _ => {
+            field.write_char(ch)
+            ended_with_record_separator = false
+          }
+        }
+      Quoted =>
+        if ch == '"' {
+          state = AfterQuote
+        } else {
+          field.write_char(ch)
+        }
+      AfterQuote =>
+        match ch {
+          '"' => {
+            field.write_char('"')
+            state = Quoted
+            ended_with_record_separator = false
+          }
+          ',' => {
+            field = push_csv_field(row, field)
+            state = Unquoted
+            ended_with_record_separator = false
+          }
+          '\n' => {
+            field = push_csv_field(row, field)
+            row = push_csv_record(records, row)
+            state = Unquoted
+            ended_with_record_separator = true
+          }
+          '\r' => ()
+          ' ' | '\t' => ()
+          _ => {
+            field.write_char(ch)
+            state = Unquoted
+            ended_with_record_separator = false
+          }
+        }
+    }
+  }
+
+  if !ended_with_record_separator || row.length() > 0 {
+    ignore(push_csv_field(row, field))
+    ignore(push_csv_record(records, row))
+  }
+  records
+}
 
 // Parse CSV text into (headers, rows)
 
 ///|
 pub fn parse_csv(content : String) -> (Array[String], Array[Array[String]]) {
-  let line_views = content.split("\n").to_array()
-  // Collect non-empty lines
-  let lines : Array[String] = []
-  for i = 0; i < line_views.length(); i = i + 1 {
-    let line = line_views[i].to_owned()
-    if line != "" {
-      lines.push(line)
-    }
-  }
-  if lines.length() == 0 {
+  let records = parse_csv_records(content)
+  if records.length() == 0 {
     ([], [])
   } else {
-    // First line = headers
-    let hdr_views = lines[0].split(",").to_array()
-    let headers : Array[String] = []
-    for i = 0; i < hdr_views.length(); i = i + 1 {
-      headers.push(hdr_views[i].to_owned())
-    }
-    // Remaining lines = data rows
+    let headers = records[0]
     let rows : Array[Array[String]] = []
-    for i = 1; i < lines.length(); i = i + 1 {
-      let fld_views = lines[i].split(",").to_array()
-      let fields : Array[String] = []
-      for j = 0; j < fld_views.length(); j = j + 1 {
-        fields.push(fld_views[j].to_owned())
-      }
-      rows.push(fields)
+    for i = 1; i < records.length(); i = i + 1 {
+      rows.push(records[i])
     }
     (headers, rows)
   }
@@ -78,11 +159,12 @@ pub fn parse_csv_to_series(content : String) -> (Array[String], Array[Series]) {
 
 ///|
 pub fn parse_float_or_zero(s : String) -> Float {
-  let len = s.length()
+  let trimmed = s.trim().to_owned()
+  let len = trimmed.length()
   if len == 0 {
     Float::from_int(0)
   } else {
-    parse_float_impl(s, 0, len)
+    parse_float_impl(trimmed, 0, len)
   }
 }
 
@@ -90,26 +172,64 @@ pub fn parse_float_or_zero(s : String) -> Float {
 fn parse_float_impl(s : String, i : Int, len : Int) -> Float {
   // Check for negative sign
   let pair : (Float, Int) = if i < len && s[i] == 45 {
-    (Float::from_int(-1), i + 1)
+    (-1.0, i + 1)
+  } else if i < len && s[i] == 43 {
+    (1.0, i + 1)
   } else {
-    (Float::from_int(1), i)
+    (1.0, i)
   }
   let sign = pair.0
   let start = pair.1
-  let (int_val, after_int) = parse_int_digits(s, start, len, Float::from_int(0))
+  let (int_val, after_int) = parse_int_digits(s, start, len, 0.0)
   if after_int < len && s[after_int] == 46 {
-    let place_val : Float = Float::from_int(1) / Float::from_int(10)
-    let (frac_val, _) = parse_frac_digits(
+    let (frac_val, after_frac) = parse_frac_digits(
       s,
       after_int + 1,
       len,
-      Float::from_int(0),
-      place_val,
+      0.0,
+      0.1,
     )
-    sign * (int_val + frac_val)
+    apply_exponent(s, after_frac, len, sign * (int_val + frac_val))
   } else {
-    sign * int_val
+    apply_exponent(s, after_int, len, sign * int_val)
   }
+}
+
+///|
+fn apply_exponent(s : String, i : Int, len : Int, value : Float) -> Float {
+  if i >= len || (s[i] != 69 && s[i] != 101) {
+    value
+  } else {
+    let sign_and_start : (Int, Int) = if i + 1 < len && s[i + 1] == 45 {
+      (-1, i + 2)
+    } else if i + 1 < len && s[i + 1] == 43 {
+      (1, i + 2)
+    } else {
+      (1, i + 1)
+    }
+    let (exponent, after_exponent) = parse_int_digits(
+      s,
+      sign_and_start.1,
+      len,
+      0.0,
+    )
+    if after_exponent == sign_and_start.1 {
+      value
+    } else {
+      scale_by_power10(value, sign_and_start.0 * exponent.to_int())
+    }
+  }
+}
+
+///|
+fn scale_by_power10(value : Float, exponent : Int) -> Float {
+  let mut result = value
+  let mut remaining = if exponent < 0 { -exponent } else { exponent }
+  while remaining > 0 {
+    result = if exponent < 0 { result / 10.0 } else { result * 10.0 }
+    remaining = remaining - 1
+  }
+  result
 }
 
 // Parse a sequence of digit characters into a Float value.

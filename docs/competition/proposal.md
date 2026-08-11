@@ -1,91 +1,27 @@
 # MoonChartSVG 项目申报书
 
-## 基本信息
-
 | 项目 | 内容 |
-|------|------|
-| **项目名称** | MoonChartSVG：纯 MoonBit SVG 图表生成库 |
-| **GitHub 仓库** | https://github.com/Mitsuha11zz/MoonChartSVG |
-| **GitLink 仓库** | https://gitlink.org.cn/Mitsuha/MoonChartSVG |
-| **项目方向** | MoonBit 工具库 / 数据可视化 |
-| **是否为移植项目** | 否（原创项目） |
-| **许可证** | Apache-2.0 |
+|---|---|
+| 项目名称 | MoonChartSVG：纯 MoonBit SVG 图表生成库 |
+| GitHub | https://github.com/Mitsuha11zz/MoonChartSVG |
+| GitLink | https://gitlink.org.cn/Mitsuha/MoonChartSVG |
+| Mooncakes 模块 | `Mitsuha11zz/MoonChartSVG` |
+| 项目方向 | MoonBit 工具库 / 数据可视化 |
+| 项目性质 | 原创项目，Apache-2.0 |
 
 ## 项目简介
+MoonChartSVG 使用纯 MoonBit 将结构化数据渲染为独立 SVG，面向报表生成、Wasm 前端、数据分析和教学演示。项目采用不可变 Builder API，不依赖浏览器 Canvas 或第三方运行时。
 
-MoonChartSVG 是一个**纯 MoonBit 实现**的 SVG 图表生成库，通过 Builder API 将结构化数据直接渲染为 SVG 字符串。支持 9 种图表类型，覆盖从基础统计到多维对比的主流可视化需求。零外部依赖，仅依赖 MoonBit 标准库和核心数学函数。
+## 核心功能
+- 支持柱状图、折线图、面积图、散点图、饼图、环形图、雷达图、堆叠柱状图和水平柱状图。
+- 提供坐标轴缩放、主题与调色板、响应式图例、XML 转义、CSV 解析、统计函数、HTML 包装和仪表盘组合。
+- 正确处理整圆 SVG 弧线、非正切片、空统计输入、带引号 CSV、极大/极小坐标轴范围和 Builder 数组隔离。
 
-MoonBit 生态目前缺乏数据可视化工具，本项目填补了这一空白。用户可通过简洁的链式 API 快速生成专业级图表，适用于报表生成、数据分析、WebAssembly 前端等场景。
+## 实施与交付
+- 维护统一渲染基础设施和九类图表实现，补充可运行 CLI 与文档示例。
+- 使用 GitHub Actions 执行 `moon check`、格式检查、`moon info`、四后端测试和覆盖率分析。
+- 当前规模为 25 个 MoonBit 文件、约 5,280 行、93 个测试；模块版本为 `0.1.7`。
+- 交付公开源码、Apache-2.0 许可证、README、开发报告、验收清单、申报书 PDF 和 Mooncakes 包。
 
-## 核心功能范围
-
-### 图表类型（9 种）
-
-| 图表 | 文件 | 说明 |
-|------|------|------|
-| **柱状图** (BarChart) | barchart.mbt (403行) | 分组柱状图，多系列并排 |
-| **折线图** (LineChart) | linechart.mbt (442行) | 多系列折线，数据点标记 |
-| **饼图** (PieChart) | piechart.mbt (265行) | 弧形切片，百分比标签 |
-| **散点图** (ScatterChart) | scatter.mbt (436行) | X-Y 数据点，可配置点大小 |
-| **雷达图** (RadarChart) | radar.mbt (411行) | 多轴对比，多层同心网格 |
-| **面积图** (AreaChart) | areachart.mbt (276行) | 折线下方填充区域 |
-| **堆叠柱状图** (StackedBarChart) | stackedbar.mbt (335行) | 系列柱体垂直堆叠 |
-| **水平柱状图** (HorBarChart) | horbarchart.mbt (380行) | 横向柱体，适合分类对比 |
-| **环形图** (DonutChart) | donutchart.mbt (228行) | 饼图中心镂空，支持比例调节 |
-
-### 基础设施模块
-
-| 模块 | 说明 |
-|------|------|
-| **ChartConfig** | 全局样式配置：自定义颜色、网格开关、字体大小 |
-| **Axes** | Y 轴自动刻度计算（nice step 算法）、坐标映射 |
-| **Color** | Tableau 10 专业调色板，支持自定义颜色循环 |
-| **Legend** | 多系列图例自动渲染 |
-| **SVG Util** | SVG 标签构建工具（rect/text/line/polyline/circle/polygon/path） |
-| **Data Stats** | 统计工具：求和、均值、中位数、标准差、排序 |
-| **CSV Reader** | CSV 数据解析，支持 Series/Slice 自动转换 |
-| **Demo** | 7 套预设演示图表，含 Dashboard 复合布局 |
-
-### 工程质量
-
-- 78 个单元测试全部通过（`moon test --deny-warn`）
-- GitHub Actions CI 持续集成（含 `moon check --deny-warn` + `moon fmt --check` + `moon info` + `moon test --deny-warn`）
-- 已发布至 mooncakes.io（`moon add Mitsuha11zz/MoonChartSVG`）
-- 完整 README（中英文、安装、快速开始、API 参考）
-- Builder API 设计，链式调用风格
-- 纯函数式实现（递归辅助函数，无 var 可变状态）
-
-## 差异化价值
-
-| 对比维度 | MoonChartSVG | 类似项目（图表生成） |
-|---------|-------------|-------------------|
-| 语言 | MoonBit | Python/JavaScript |
-| 依赖 | 零外部依赖 | matplotlib (Python), Chart.js (JS) |
-| 输出格式 | 纯 SVG 字符串 | 位图/Canvas/HTML |
-| 运行环境 | Native/Wasm/JS 三端 | 单平台 |
-| API 风格 | Builder Pattern | 命令式 / 声明式 |
-| 生态定位 | 填补 MoonBit 空白 | 成熟生态 |
-
-MoonBit 生态中**不存在可对标项目**，MoonChartSVG 是首个 MoonBit 数据可视化库。
-
-## 项目规模
-
-| 类别 | 行数 |
-|------|------|
-| 图表实现（9种） | 3,176 |
-| 基础设施（axes/color/config/legend/svg_util/palette/theme） | 643 |
-| 工具模块（csv_reader/data_stats/demo） | 619 |
-| 测试代码 | 779 |
-| Demo / CLI / 配置 | 73 |
-| **合计** | **5,290** |
-
-项目总计约 **5,290 行** MoonBit 代码，30 次有效提交，78 个测试全部通过。
-
-## 适用场景
-
-- **数据报表生成**：从 CSV 数据一键生成柱状图/折线图/饼图
-- **WebAssembly 前端可视化**：MoonBit 编译为 Wasm，在浏览器中直接渲染 SVG
-- **数据分析管道**：配合 Data Stats 模块，数据→统计→可视化一条龙
-- **教育演示**：算法可视化、数学函数图像、统计分布展示
-- **MoonBit 生态工具链**：为其他 MoonBit 项目提供可视化能力
-- **仪表盘系统**：Dashboard 复合布局，多图表同时展示
+## 独立价值
+项目针对 MoonBit 多后端与字符串生成场景设计，不声称替代成熟图表框架；其价值在于提供可复用、零运行时依赖、可在 MoonBit 项目中直接安装的 SVG 可视化基础库。

@@ -14,35 +14,47 @@ pub fn sum(values : Array[Float]) -> Float {
 
 ///|
 pub fn mean(values : Array[Float]) -> Float {
-  sum(values) / Float::from_int(values.length())
+  if values.length() == 0 {
+    0.0
+  } else {
+    sum(values) / Float::from_int(values.length())
+  }
 }
 
 ///|
 pub fn min_value(values : Array[Float]) -> Float {
-  fn aux(idx : Int, current_min : Float) -> Float {
-    if idx >= values.length() {
-      current_min
-    } else if values[idx] < current_min {
-      aux(idx + 1, values[idx])
-    } else {
-      aux(idx + 1, current_min)
+  if values.length() == 0 {
+    0.0
+  } else {
+    fn aux(idx : Int, current_min : Float) -> Float {
+      if idx >= values.length() {
+        current_min
+      } else if values[idx] < current_min {
+        aux(idx + 1, values[idx])
+      } else {
+        aux(idx + 1, current_min)
+      }
     }
+    aux(1, values[0])
   }
-  aux(1, values[0])
 }
 
 ///|
 pub fn max_value(values : Array[Float]) -> Float {
-  fn aux(idx : Int, current_max : Float) -> Float {
-    if idx >= values.length() {
-      current_max
-    } else if values[idx] > current_max {
-      aux(idx + 1, values[idx])
-    } else {
-      aux(idx + 1, current_max)
+  if values.length() == 0 {
+    0.0
+  } else {
+    fn aux(idx : Int, current_max : Float) -> Float {
+      if idx >= values.length() {
+        current_max
+      } else if values[idx] > current_max {
+        aux(idx + 1, values[idx])
+      } else {
+        aux(idx + 1, current_max)
+      }
     }
+    aux(1, values[0])
   }
-  aux(1, values[0])
 }
 
 // Append remaining elements from source[from..] into target
@@ -137,8 +149,11 @@ fn sqrt_approx(x : Float) -> Float {
 
 ///|
 pub fn std_dev(values : Array[Float]) -> Float {
-  let m = mean(values)
   let n = values.length()
+  if n == 0 {
+    return 0.0
+  }
+  let m = mean(values)
 
   fn sum_sq_diff(idx : Int, acc : Float) -> Float {
     if idx >= n {

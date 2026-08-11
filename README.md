@@ -50,20 +50,28 @@ dashboard, theme usage, and CSV-driven data.
 ```bash
 moon check --deny-warn --target all
 moon fmt --check
-moon info
+moon info --target all
 moon test --deny-warn --target all
+moon coverage analyze
 ```
 
 The current MoonBit CLI does not accept `--deny-warn` for `moon fmt` or
 `moon info`; `moon fmt --check` and a clean `moon info` run are the supported
-equivalent checks.
+equivalent checks. The current suite contains 93 tests.
 
 ## Data Behavior
 
 - Pie and donut slices with values less than or equal to zero are ignored.
 - A pie or donut whose positive total is zero renders an empty SVG chart.
+- A single 100% pie uses two SVG half-arcs; a donut uses paired outer and
+  inner half-arcs so both render consistently across SVG engines.
 - Donut hole ratios are clamped to the range `0.0..0.95`.
+- Radar grid levels are clamped to at least one.
 - Radar values missing from a series are rendered as zero.
+- CSV input supports quoted fields, escaped quotes, embedded newlines, and
+  CRLF records.
+- Empty statistical inputs return `0.0` instead of dividing by zero or
+  indexing an empty array.
 - User-provided SVG text and attributes are XML escaped.
 
 ## License

@@ -99,29 +99,59 @@ fn slice_path(
   start_angle : Float,
   end_angle : Float,
 ) -> String {
-  let (x1, y1) = polar_to_cartesian(cx, cy, r, end_angle)
-  let (x2, y2) = polar_to_cartesian(cx, cy, r, start_angle)
   let pi : Float = 3.1415926535
-  let large_arc = if end_angle - start_angle > pi { "1" } else { "0" }
-  "M " +
-  cx.to_string() +
-  " " +
-  cy.to_string() +
-  " L " +
-  x1.to_string() +
-  " " +
-  y1.to_string() +
-  " A " +
-  r.to_string() +
-  " " +
-  r.to_string() +
-  " 0 " +
-  large_arc +
-  " 0 " +
-  x2.to_string() +
-  " " +
-  y2.to_string() +
-  " Z"
+  let sweep = end_angle - start_angle
+  let (start_x, start_y) = polar_to_cartesian(cx, cy, r, start_angle)
+  if sweep >= 2.0 * pi - 0.0001 {
+    let (mid_x, mid_y) = polar_to_cartesian(cx, cy, r, start_angle + pi)
+    "M " +
+    cx.to_string() +
+    " " +
+    cy.to_string() +
+    " L " +
+    start_x.to_string() +
+    " " +
+    start_y.to_string() +
+    " A " +
+    r.to_string() +
+    " " +
+    r.to_string() +
+    " 0 1 0 " +
+    mid_x.to_string() +
+    " " +
+    mid_y.to_string() +
+    " A " +
+    r.to_string() +
+    " " +
+    r.to_string() +
+    " 0 1 0 " +
+    start_x.to_string() +
+    " " +
+    start_y.to_string() +
+    " Z"
+  } else {
+    let (end_x, end_y) = polar_to_cartesian(cx, cy, r, end_angle)
+    let large_arc = if sweep > pi { "1" } else { "0" }
+    "M " +
+    cx.to_string() +
+    " " +
+    cy.to_string() +
+    " L " +
+    end_x.to_string() +
+    " " +
+    end_y.to_string() +
+    " A " +
+    r.to_string() +
+    " " +
+    r.to_string() +
+    " 0 " +
+    large_arc +
+    " 0 " +
+    start_x.to_string() +
+    " " +
+    start_y.to_string() +
+    " Z"
+  }
 }
 
 // Recursive sum of slice values

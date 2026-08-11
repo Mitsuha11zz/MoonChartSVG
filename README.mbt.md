@@ -32,9 +32,10 @@ test "render a standalone SVG chart" {
 - Automatic axis scaling and built-in themes
 - Multi-row legends for narrow canvases
 - Correct pie, donut, and radar coordinates in every quadrant
+- Complete-circle pie and donut paths compatible with SVG renderers
 - XML escaping for user-provided labels and attributes
 - Defensive array copies for predictable builder semantics
-- CSV parsing, statistics, HTML wrappers, and dashboard composition
+- Quoted CSV parsing, safe empty statistics, HTML wrappers, and dashboards
 
 ## Demo
 
@@ -47,12 +48,14 @@ moon run cmd/main
 ```bash
 moon check --deny-warn --target all
 moon fmt --check
-moon info
+moon info --target all
 moon test --deny-warn --target all
+moon coverage analyze
 ```
 
 Non-positive pie and donut slices are ignored, zero totals render without
 invalid coordinates, and donut hole ratios are clamped to `0.0..0.95`.
+The current suite contains 93 tests.
 
 ## License
 

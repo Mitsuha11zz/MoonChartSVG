@@ -12,11 +12,18 @@ jobs:
         run: curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
       - name: Add MoonBit to PATH
         run: echo "$HOME/.moon/bin" >> $GITHUB_PATH
-      - name: Moon Info
-        run: moon info
       - name: Moon Check
-        run: moon check --deny-warn
+        run: moon check --deny-warn --target all
+      # The current CLI has no --deny-warn option for fmt; --check is the
+      # supported non-mutating formatting gate.
       - name: Moon Format Check
         run: moon fmt --check
+      # The current CLI has no --deny-warn option for info. A clean all-target
+      # run verifies that public interfaces can be generated without warnings.
+      - name: Moon Info
+        run: moon info --target all
       - name: Moon Test
-        run: moon test --deny-warn
+        run: moon test --deny-warn --target all
+      - name: Moon Coverage
+        if: matrix.os == 'ubuntu-latest'
+        run: moon coverage analyze

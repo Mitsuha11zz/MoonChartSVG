@@ -8,38 +8,33 @@ struct AxisLayout {
 
 ///|
 fn nice_step(range : Float, max_ticks : Int) -> Float {
-  let rough_step = range / Float::from_int(max_ticks)
-  let rough = rough_step
-  if rough >= 1.0 {
-    if rough <= 2.0 {
-      1.0
-    } else if rough <= 5.0 {
-      2.0
-    } else if rough <= 10.0 {
-      5.0
-    } else if rough <= 20.0 {
-      10.0
-    } else if rough <= 50.0 {
-      20.0
-    } else if rough <= 100.0 {
-      50.0
-    } else if rough <= 200.0 {
-      100.0
-    } else if rough <= 500.0 {
-      200.0
-    } else if rough <= 1000.0 {
-      500.0
-    } else {
-      1000.0
-    }
-  } else if rough >= 0.5 {
-    0.5
-  } else if rough >= 0.2 {
-    0.2
-  } else if rough >= 0.1 {
-    0.1
+  if range <= 0.0 || max_ticks <= 0 {
+    1.0
   } else {
-    0.05
+    let rough_step = range / Float::from_int(max_ticks)
+    let mut normalized = rough_step
+    let mut magnitude : Float = 1.0
+    let mut shifts = 0
+    while normalized >= 10.0 && shifts < 64 {
+      normalized = normalized / 10.0
+      magnitude = magnitude * 10.0
+      shifts = shifts + 1
+    }
+    while normalized < 1.0 && shifts < 128 {
+      normalized = normalized * 10.0
+      magnitude = magnitude / 10.0
+      shifts = shifts + 1
+    }
+    let factor : Float = if normalized <= 1.0 {
+      1.0
+    } else if normalized <= 2.0 {
+      2.0
+    } else if normalized <= 5.0 {
+      5.0
+    } else {
+      10.0
+    }
+    factor * magnitude
   }
 }
 

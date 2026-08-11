@@ -797,3 +797,80 @@ test "builder methods isolate mutable input arrays" {
   assert_eq(pie.slices.length(), 0)
   assert_eq(pie_with_slice.slices.length(), 1)
 }
+
+///|
+test "axis step scales across tiny and large ranges" {
+  let tiny = nice_step(0.0008, 8)
+  let large = nice_step(80000000.0, 8)
+  assert_eq(tiny > 0.00009 && tiny < 0.00011, true)
+  assert_eq(large, 10000000.0)
+  assert_eq(nice_step(0.0, 8), 1.0)
+  assert_eq(nice_step(10.0, 0), 1.0)
+}
+
+///|
+test "single slice pie uses two arcs for a complete circle" {
+  let pi : Float = 3.1415926535
+  let d = slice_path(100.0, 100.0, 50.0, 0.0, 2.0 * pi)
+  assert_eq(d.split(" A ").to_array().length(), 3)
+  let svg = PieChart::new().slice("Only", 100.0).render()
+  assert_eq(svg.contains("100%"), true)
+  assert_eq(svg.contains("NaN"), false)
+}
+
+///|
+test "single slice donut uses four arcs for a complete ring" {
+  let pi : Float = 3.1415926535
+  let d = donut_slice_path(100.0, 100.0, 50.0, 20.0, 0.0, 2.0 * pi)
+  assert_eq(d.split(" A ").to_array().length(), 5)
+  let svg = DonutChart::new().slice("Only", 100.0).render()
+  assert_eq(svg.contains("100%"), true)
+  assert_eq(svg.contains("NaN"), false)
+}
+
+///|
+test "csv supports quoted commas and escaped quotes" {
+  let (headers, rows) = parse_csv(
+    "Name,Note,Value\r\n\"A, Inc.\",\"said \"\"hello\"\"\",12\r\n",
+  )
+  assert_eq(headers.length(), 3)
+  assert_eq(rows.length(), 1)
+  assert_eq(rows[0][0], "A, Inc.")
+  assert_eq(rows[0][1], "said \"hello\"")
+  assert_eq(rows[0][2], "12")
+}
+
+///|
+test "csv supports newlines inside quoted fields" {
+  let (_, rows) = parse_csv("Name,Note\r\nA,\"line 1\nline 2\"\r\n")
+  assert_eq(rows.length(), 1)
+  assert_eq(rows[0][1], "line 1\nline 2")
+}
+
+///|
+test "numeric parser accepts whitespace signs and exponents" {
+  assert_eq(parse_float_or_zero("  +12.5  "), 12.5)
+  assert_eq(parse_float_or_zero("1.5e+2"), 150.0)
+  assert_eq(parse_float_or_zero("-2E-2"), -0.02)
+}
+
+///|
+test "empty statistics use documented zero defaults" {
+  assert_eq(mean([]), 0.0)
+  assert_eq(min_value([]), 0.0)
+  assert_eq(max_value([]), 0.0)
+  assert_eq(median([]), 0.0)
+  assert_eq(std_dev([]), 0.0)
+}
+
+///|
+test "radar levels are clamped to a valid grid" {
+  let chart = RadarChart::new().levels(0)
+  assert_eq(chart.levels, 1)
+  let svg = chart
+    .axis_labels(["A", "B", "C"])
+    .series(Series::new("S", [1.0, 2.0, 3.0]))
+    .render()
+  assert_eq(svg.contains("<polygon"), true)
+  assert_eq(svg.contains("NaN"), false)
+}

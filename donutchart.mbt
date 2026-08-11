@@ -65,6 +65,7 @@ fn donut_slice_path(
   start_angle : Float,
   end_angle : Float,
 ) -> String {
+  let pi : Float = 3.1415926535
   let (outer_start_x, outer_start_y) = polar_to_cartesian(
     cx, cy, outer_r, start_angle,
   )
@@ -77,38 +78,93 @@ fn donut_slice_path(
   let (inner_end_x, inner_end_y) = polar_to_cartesian(
     cx, cy, inner_r, end_angle,
   )
-  let pi : Float = 3.1415926535
-  let large_arc = if end_angle - start_angle > pi { "1" } else { "0" }
-
-  "M " +
-  outer_start_x.to_string() +
-  " " +
-  outer_start_y.to_string() +
-  " A " +
-  outer_r.to_string() +
-  " " +
-  outer_r.to_string() +
-  " 0 " +
-  large_arc +
-  " 0 " +
-  outer_end_x.to_string() +
-  " " +
-  outer_end_y.to_string() +
-  " L " +
-  inner_end_x.to_string() +
-  " " +
-  inner_end_y.to_string() +
-  " A " +
-  inner_r.to_string() +
-  " " +
-  inner_r.to_string() +
-  " 0 " +
-  large_arc +
-  " 1 " +
-  inner_start_x.to_string() +
-  " " +
-  inner_start_y.to_string() +
-  " Z"
+  let sweep = end_angle - start_angle
+  if sweep >= 2.0 * pi - 0.0001 {
+    let (outer_mid_x, outer_mid_y) = polar_to_cartesian(
+      cx,
+      cy,
+      outer_r,
+      start_angle + pi,
+    )
+    let (inner_mid_x, inner_mid_y) = polar_to_cartesian(
+      cx,
+      cy,
+      inner_r,
+      start_angle + pi,
+    )
+    "M " +
+    outer_start_x.to_string() +
+    " " +
+    outer_start_y.to_string() +
+    " A " +
+    outer_r.to_string() +
+    " " +
+    outer_r.to_string() +
+    " 0 1 0 " +
+    outer_mid_x.to_string() +
+    " " +
+    outer_mid_y.to_string() +
+    " A " +
+    outer_r.to_string() +
+    " " +
+    outer_r.to_string() +
+    " 0 1 0 " +
+    outer_start_x.to_string() +
+    " " +
+    outer_start_y.to_string() +
+    " L " +
+    inner_start_x.to_string() +
+    " " +
+    inner_start_y.to_string() +
+    " A " +
+    inner_r.to_string() +
+    " " +
+    inner_r.to_string() +
+    " 0 1 1 " +
+    inner_mid_x.to_string() +
+    " " +
+    inner_mid_y.to_string() +
+    " A " +
+    inner_r.to_string() +
+    " " +
+    inner_r.to_string() +
+    " 0 1 1 " +
+    inner_start_x.to_string() +
+    " " +
+    inner_start_y.to_string() +
+    " Z"
+  } else {
+    let large_arc = if sweep > pi { "1" } else { "0" }
+    "M " +
+    outer_start_x.to_string() +
+    " " +
+    outer_start_y.to_string() +
+    " A " +
+    outer_r.to_string() +
+    " " +
+    outer_r.to_string() +
+    " 0 " +
+    large_arc +
+    " 0 " +
+    outer_end_x.to_string() +
+    " " +
+    outer_end_y.to_string() +
+    " L " +
+    inner_end_x.to_string() +
+    " " +
+    inner_end_y.to_string() +
+    " A " +
+    inner_r.to_string() +
+    " " +
+    inner_r.to_string() +
+    " 0 " +
+    large_arc +
+    " 1 " +
+    inner_start_x.to_string() +
+    " " +
+    inner_start_y.to_string() +
+    " Z"
+  }
 }
 
 // Render donut slices recursively

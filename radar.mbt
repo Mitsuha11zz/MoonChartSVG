@@ -59,7 +59,7 @@ pub fn RadarChart::config(self : RadarChart, c : ChartConfig) -> RadarChart {
 
 ///|
 pub fn RadarChart::levels(self : RadarChart, l : Int) -> RadarChart {
-  { ..self, levels: l }
+  { ..self, levels: if l < 1 { 1 } else { l } }
 }
 
 // Find max value across all series (for scaling data polygons)
